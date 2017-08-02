@@ -30,6 +30,6 @@ class ContactCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        name.frame = CGRect(x: LEFT_MARGIN, y: frame.origin.y, width: frame.width, height: frame.height)
+        name.frame = CGRect(x: LEFT_MARGIN, y: bounds.origin.y, width: bounds.width, height: bounds.height)
     }
 }

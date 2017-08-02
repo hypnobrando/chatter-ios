@@ -40,11 +40,11 @@ class Chat: JSQMessagesViewController {
     // JSQMessageViewController
     
     override func senderId() -> String {
-        return "FAKE_ID"
+        return cache().user.stringID()
     }
     
     override func senderDisplayName() -> String {
-        return "you"
+        return cache().user.fullName()
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView, messageDataForItemAt indexPath: IndexPath) -> JSQMessageData {

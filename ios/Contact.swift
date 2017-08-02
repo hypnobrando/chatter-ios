@@ -14,12 +14,22 @@ class Contact {
     var id : Int
     
     init() {
-        firstName = "Galt"
-        lastName = "MacDermot"
-        id = 0
+        firstName = ""
+        lastName = ""
+        id = -1
     }
     
-    func fullName () -> String {
+    init(firstName: String, lastName: String, id: Int) {
+        self.firstName = firstName
+        self.lastName = lastName
+        self.id = id
+    }
+    
+    func fullName() -> String {
         return firstName + " " + lastName
+    }
+    
+    func stringID() -> String {
+        return String(id)
     }
 }

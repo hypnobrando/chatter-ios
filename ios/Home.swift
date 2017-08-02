@@ -55,7 +55,7 @@ class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
     }
 
     func getContacts() -> [Contact] {
-        return [Contact()]
+        return [Contact(firstName: "Galt", lastName: "MacDermot", id: 1), Contact(firstName: "Jacob", lastName: "Kim", id: 2)]
     }
     
     func connectButtonPressed(sender: UIButton!) {
@@ -76,7 +76,6 @@ class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
         let contact = contacts[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
         cell.name.text = contact.fullName()
-        cell.sizeToFit()
         return cell
     }
     
