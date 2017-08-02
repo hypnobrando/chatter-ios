@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		737124D23826C8ABDC53C4C8 /* Pods_ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24906CD6000AA17C6A49F794 /* Pods_ios.framework */; };
+		A82974B81F3282DF00DC7B7A /* SignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82974B71F3282DF00DC7B7A /* SignIn.swift */; };
+		A82974BB1F32837300DC7B7A /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82974BA1F32837300DC7B7A /* Cache.swift */; };
+		A82974BE1F3286D200DC7B7A /* +UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82974BD1F3286D200DC7B7A /* +UIViewController.swift */; };
 		A82D16861F3255320088B59D /* ContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82D16851F3255320088B59D /* ContactCell.swift */; };
 		A8AFBC881F324C9A007A5FEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */; };
 		A8AFBC8A1F324C9A007A5FEE /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8AFBC891F324C9A007A5FEE /* Home.swift */; };
@@ -21,6 +24,9 @@
 /* Begin PBXFileReference section */
 		24906CD6000AA17C6A49F794 /* Pods_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B26F86E749D494F30DE900B /* Pods-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.release.xcconfig"; path = "Pods/Target Support Files/Pods-ios/Pods-ios.release.xcconfig"; sourceTree = "<group>"; };
+		A82974B71F3282DF00DC7B7A /* SignIn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignIn.swift; sourceTree = "<group>"; };
+		A82974BA1F32837300DC7B7A /* Cache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
+		A82974BD1F3286D200DC7B7A /* +UIViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "+UIViewController.swift"; sourceTree = "<group>"; };
 		A82D16851F3255320088B59D /* ContactCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactCell.swift; sourceTree = "<group>"; };
 		A8AFBC841F324C9A007A5FEE /* ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -63,6 +69,22 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		A82974B91F32835500DC7B7A /* Cache */ = {
+			isa = PBXGroup;
+			children = (
+				A82974BA1F32837300DC7B7A /* Cache.swift */,
+			);
+			name = Cache;
+			sourceTree = "<group>";
+		};
+		A82974BC1F3286BD00DC7B7A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				A82974BD1F3286D200DC7B7A /* +UIViewController.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
 		A82D16841F3255130088B59D /* Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -92,7 +114,9 @@
 		A8AFBC861F324C9A007A5FEE /* ios */ = {
 			isa = PBXGroup;
 			children = (
-				A8AFBCA01F32513A007A5FEE /* Contacts */,
+				A82974BC1F3286BD00DC7B7A /* Extensions */,
+				A82974B91F32835500DC7B7A /* Cache */,
+				A8AFBCA01F32513A007A5FEE /* Contact */,
 				A82D16841F3255130088B59D /* Cells */,
 				A8AFBC9C1F324E4E007A5FEE /* VC */,
 				A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */,
@@ -109,16 +133,17 @@
 			children = (
 				A8AFBC891F324C9A007A5FEE /* Home.swift */,
 				A8AFBC9D1F324E96007A5FEE /* Chat.swift */,
+				A82974B71F3282DF00DC7B7A /* SignIn.swift */,
 			);
 			name = VC;
 			sourceTree = "<group>";
 		};
-		A8AFBCA01F32513A007A5FEE /* Contacts */ = {
+		A8AFBCA01F32513A007A5FEE /* Contact */ = {
 			isa = PBXGroup;
 			children = (
 				A8AFBCA11F325148007A5FEE /* Contact.swift */,
 			);
-			name = Contacts;
+			name = Contact;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -246,8 +271,11 @@
 			files = (
 				A82D16861F3255320088B59D /* ContactCell.swift in Sources */,
 				A8AFBC901F324C9A007A5FEE /* ios.xcdatamodeld in Sources */,
+				A82974BB1F32837300DC7B7A /* Cache.swift in Sources */,
 				A8AFBC9E1F324E96007A5FEE /* Chat.swift in Sources */,
 				A8AFBC8A1F324C9A007A5FEE /* Home.swift in Sources */,
+				A82974BE1F3286D200DC7B7A /* +UIViewController.swift in Sources */,
+				A82974B81F3282DF00DC7B7A /* SignIn.swift in Sources */,
 				A8AFBC881F324C9A007A5FEE /* AppDelegate.swift in Sources */,
 				A8AFBCA21F325148007A5FEE /* Contact.swift in Sources */,
 			);
