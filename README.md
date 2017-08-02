@@ -1,6 +1,6 @@
 # secure-chat-ios
 
-### Run locally:
+### run locally:
 * install [cocoa pods](https://cocoapods.org/)
 * `pod install` to install dependencies
 * `open ios.xcworkspace` to open the app in xcode
