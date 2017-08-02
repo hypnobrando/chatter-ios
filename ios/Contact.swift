@@ -11,9 +11,15 @@ import Foundation
 class Contact {
     var firstName : String
     var lastName : String
+    var id : Int
     
     init() {
         firstName = "Galt"
         lastName = "MacDermot"
+        id = 0
+    }
+    
+    func fullName () -> String {
+        return firstName + " " + lastName
     }
 }

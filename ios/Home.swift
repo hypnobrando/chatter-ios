@@ -10,7 +10,7 @@ import UIKit
 
 class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    let BOTTOM_MARGIN : CGFloat = 75.0
+    let BOTTOM_MARGIN : CGFloat = 50.0
     
     var contacts = [Contact]()
     var table = UITableView()
@@ -75,7 +75,7 @@ class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let contact = contacts[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
-        cell.name.text = contact.firstName + " " + contact.lastName
+        cell.name.text = contact.fullName()
         cell.sizeToFit()
         return cell
     }
@@ -88,6 +88,7 @@ class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let chat = Chat()
+        chat.incomingContact = contacts[indexPath.row]
         navigationController?.pushViewController(chat, animated: true)
         tableView.deselectRow(at: indexPath, animated: true)
     }

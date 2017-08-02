@@ -92,7 +92,7 @@
 		A8AFBC861F324C9A007A5FEE /* ios */ = {
 			isa = PBXGroup;
 			children = (
-				A8AFBCA01F32513A007A5FEE /* Contacts */,
+				A8AFBCA01F32513A007A5FEE /* Contact */,
 				A82D16841F3255130088B59D /* Cells */,
 				A8AFBC9C1F324E4E007A5FEE /* VC */,
 				A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */,
@@ -113,12 +113,12 @@
 			name = VC;
 			sourceTree = "<group>";
 		};
-		A8AFBCA01F32513A007A5FEE /* Contacts */ = {
+		A8AFBCA01F32513A007A5FEE /* Contact */ = {
 			isa = PBXGroup;
 			children = (
 				A8AFBCA11F325148007A5FEE /* Contact.swift */,
 			);
-			name = Contacts;
+			name = Contact;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
