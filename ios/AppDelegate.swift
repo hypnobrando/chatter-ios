@@ -19,10 +19,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         self.window = UIWindow(frame: UIScreen.main.bounds)
-        let nav = UINavigationController()
-        let mainView = Home()
-        nav.viewControllers = [mainView]
-        self.window!.rootViewController = nav
+        
+        // Load the cache if it exists.
+        cache = Cache.loadUser()
+        //cache.clear()
+        var mainView : UIViewController
+        if cache.loaded {
+            mainView = UINavigationController()
+            let home = Home()
+            (mainView as! UINavigationController).viewControllers = [home]
+        } else {
+            mainView = SignIn()
+        }
+        
+        self.window!.rootViewController = mainView
         self.window?.makeKeyAndVisible()
         
         return true

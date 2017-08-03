@@ -8,12 +8,38 @@
 
 import UIKit
 
-class SignIn: UIViewController {
-
+class SignIn: UIViewController, UITextFieldDelegate {
+    
+    let TOP_MARGIN = CGFloat(100.0)
+    let LEFT_MARGIN = CGFloat(45.0)
+    let LABEL_HEIGHT = CGFloat(40.0)
+    let LABEL_SPACE = CGFloat(20.0)
+    
+    var firstName = UITextField()
+    var lastName = UITextField()
+    var submit = UIButton()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        // Setup main view.
+        view.backgroundColor = UIColor.white
+        
+        // Setup views.
+        firstName = TextField(frame: CGRect(x: LEFT_MARGIN, y: TOP_MARGIN, width: view.frame.width - 2 * LEFT_MARGIN, height: LABEL_HEIGHT), placeholder: "first name...")
+        lastName = TextField(frame: CGRect(x: firstName.frame.origin.x, y: firstName.frame.origin.y + firstName.frame.height + LABEL_SPACE, width: firstName.frame.width, height: firstName.frame.height), placeholder: "last name...")
+        firstName.delegate = self
+        lastName.delegate = self
+        submit = UIButton(frame: CGRect(x: LEFT_MARGIN, y: lastName.frame.origin.y + lastName.frame.height + LABEL_SPACE, width: lastName.frame.width, height: lastName.frame.height))
+        submit.backgroundColor = UIColor.blue
+        submit.setTitle("Submit", for: .normal)
+        submit.addTarget(self, action: #selector(submitButtonTapped), for: .touchUpInside)
+        
+        self.view.addSubview(firstName)
+        self.view.addSubview(lastName)
+        self.view.addSubview(submit)
     }
 
     override func didReceiveMemoryWarning() {
@@ -21,15 +47,24 @@ class SignIn: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    func submitButtonTapped(sender: UIButton!) {
+        
+        // Send data to backend.
+        
+        // Cache the user info.
+        saveCacheToAppDelegate(cache: Cache.cacheUser(contact: Contact(firstName: firstName.text!, lastName: lastName.text!, id: -1)))
+        
+        // Transition to next vc.
+        let nav = UINavigationController()
+        let home = Home()
+        nav.viewControllers = [home]
+        present(nav, animated: true, completion: nil)
     }
-    */
+    
+    // UITextField Delegate
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        return textField.resignFirstResponder()
+    }
 
 }

@@ -13,4 +13,8 @@ extension UIViewController {
     func cache() -> Cache {
         return (UIApplication.shared.delegate as! AppDelegate).cache
     }
+    
+    func saveCacheToAppDelegate(cache: Cache) {
+        (UIApplication.shared.delegate as! AppDelegate).cache = cache
+    }
 }
