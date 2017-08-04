@@ -37,6 +37,7 @@
 		A82974C41F34091F00DC7B7A /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
 		A82974C91F346F3800DC7B7A /* Chat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chat.swift; sourceTree = "<group>"; };
 		A82974CC1F34700600DC7B7A /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		A82974CE1F3527B900DC7B7A /* ios.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ios.entitlements; path = ios/ios.entitlements; sourceTree = "<group>"; };
 		A82D16851F3255320088B59D /* ContactCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactCell.swift; sourceTree = "<group>"; };
 		A8AFBC841F324C9A007A5FEE /* ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -131,6 +132,7 @@
 		A8AFBC7B1F324C9A007A5FEE = {
 			isa = PBXGroup;
 			children = (
+				A82974CE1F3527B900DC7B7A /* ios.entitlements */,
 				A8AFBC861F324C9A007A5FEE /* Lib */,
 				A8AFBC851F324C9A007A5FEE /* Products */,
 				A073DC775D0065E86FEB2611 /* Pods */,
@@ -222,7 +224,12 @@
 					A8AFBC831F324C9A007A5FEE = {
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = 46YL5H8DDP;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -438,11 +445,15 @@
 			baseConfigurationReference = E8DD1625AE0DF654FC9ABB74 /* Pods-ios.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ios/ios.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Brandon Price (9XNKJUVES2)";
 				DEVELOPMENT_TEAM = 46YL5H8DDP;
 				INFOPLIST_FILE = ios/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = BEPco.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = BEPco.chatter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "8a1bc32f-8d84-483b-8b1c-34da9fb336b7";
+				PROVISIONING_PROFILE_SPECIFIER = "Chatter Development";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -452,11 +463,14 @@
 			baseConfigurationReference = 3B26F86E749D494F30DE900B /* Pods-ios.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ios/ios.entitlements;
 				DEVELOPMENT_TEAM = 46YL5H8DDP;
 				INFOPLIST_FILE = ios/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = BEPco.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = BEPco.chatter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "8a1bc32f-8d84-483b-8b1c-34da9fb336b7";
+				PROVISIONING_PROFILE_SPECIFIER = "Chatter Development";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
