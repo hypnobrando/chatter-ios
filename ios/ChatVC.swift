@@ -115,10 +115,18 @@ class ChatVC: JSQMessagesViewController {
     }
     
     override func didPressSend(_ button: UIButton, withMessageText text: String, senderId: String, senderDisplayName: String, date: Date) {
-        // TODO: Send message to backend.
-        
-        addMessage(withId: senderId, name: senderDisplayName, text: text)
-        finishSendingMessage()
+        // Send message to backend.
+        API.createMessage(userId: senderId, chatId: chat.id, message: text, completionHandler: {
+            (response, _) in
+            
+            if response != URLResponse.Success {
+            print(response)
+            return
+            }
+            
+            self.addMessage(withId: senderId, name: senderDisplayName, text: text)
+            self.finishSendingMessage()
+        })
     }
     
     /*

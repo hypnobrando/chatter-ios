@@ -86,12 +86,34 @@ class API {
                 return completionHandler(URLResponse.Error, nil)
             }
             
-            let messagesJson = data["messages"] as! [[String : Any]]
-            var chatJson = data["chat"] as! [String : Any]
-            let usersJson = data["users"] as! [[String : Any]]
-            chatJson["messages"] = messagesJson
-            chatJson["users"] = usersJson
+            let chatJson = loadMessageFromData(data: data)
+
+            let chat = Chat.deserialize(json: chatJson)
             
+            completionHandler(URLResponse.Success, chat)
+        })
+    }
+    
+    class func createMessage(userId: String, chatId: String, message: String, completionHandler: @escaping (URLResponse, Chat?) -> Void) {
+        let json = ["message": message]
+        
+        API.performRequest(requestType: "POST", urlPath: "users/" + userId + "/chats/" + chatId + "/messages", json: json, token: nil, completionHandler: {
+            (response, data) in
+            
+            if let _ = data as? URLResponse {
+                return completionHandler(URLResponse.ServerDown, nil)
+            }
+            
+            if response == nil {
+                return completionHandler(URLResponse.NotConnected, nil)
+            }
+            
+            let data = data as! [String : Any]
+            if data["error"] != nil {
+                return completionHandler(URLResponse.Error, nil)
+            }
+            
+            let chatJson = loadMessageFromData(data: data)
             let chat = Chat.deserialize(json: chatJson)
             
             completionHandler(URLResponse.Success, chat)
@@ -99,6 +121,16 @@ class API {
     }
     
     // HELPERS
+    
+    class func loadMessageFromData(data: [String : Any]) -> [String : Any] {
+        let messagesJson = data["messages"] as! [[String : Any]]
+        var chatJson = data["chat"] as! [String : Any]
+        let usersJson = data["users"] as! [[String : Any]]
+        chatJson["messages"] = messagesJson
+        chatJson["users"] = usersJson
+        
+        return chatJson
+    }
     
     class func performRequest(requestType: String, urlPath: String, json: [String: Any]?, token: String?, completionHandler: @escaping (HTTPURLResponse?, Any?) -> Void) {
         
