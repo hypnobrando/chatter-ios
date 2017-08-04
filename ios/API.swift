@@ -15,9 +15,7 @@ class API {
     //static let rootURLString : String = environment != "development" ? "https://chatter-" + environment + ".herokuapp.com/" : "http://127.0.0.1:8080/"
     static let rootURLString : String = "http://127.0.0.1:8080/"
     
-    /* Method for creating a new user
-     * returns Success, Error
-     */
+    // Users
     
     class func createUser(firstName: String, lastName: String, completion_handler: @escaping (URLResponse, Contact?) -> Void) {
         
@@ -44,6 +42,11 @@ class API {
             let contact = Contact(firstName: user["first_name"]!, lastName: user["last_name"]!, id: user["_id"]!)
             completion_handler(URLResponse.Success, contact)
         })
+    }
+    
+    // Chats
+    class func getUsersChats(userId: String, completion_handler: @escaping (URLResponse, Contact?) -> Void) {
+        
     }
     
     // HELPERS

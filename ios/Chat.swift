@@ -5,12 +5,11 @@
 //  Created by Brandon Price on 8/2/17.
 //  Copyright © 2017 Brandon Price. All rights reserved.
 //
-
 import UIKit
 import JSQMessagesViewController
 
 class Chat: JSQMessagesViewController {
-
+    
     var incomingContact = Contact()
     var messages = [JSQMessage]()
     
@@ -26,7 +25,7 @@ class Chat: JSQMessagesViewController {
         collectionView!.collectionViewLayout.outgoingAvatarViewSize = CGSize.zero
         inputToolbar.contentView?.leftBarButtonItem = nil
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -64,7 +63,7 @@ class Chat: JSQMessagesViewController {
         let bubbleImageFactory = JSQMessagesBubbleImageFactory()
         return bubbleImageFactory.incomingMessagesBubbleImage(with: UIColor.jsq_messageBubbleLightGray())
     }
-
+    
     override func collectionView(_ collectionView: JSQMessagesCollectionView, messageBubbleImageDataForItemAt indexPath: IndexPath) -> JSQMessageBubbleImageDataSource? {
         let message = messages[indexPath.item]
         if message.senderId == senderId() {
@@ -86,13 +85,12 @@ class Chat: JSQMessagesViewController {
     }
     
     /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+     // MARK: - Navigation
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
 }

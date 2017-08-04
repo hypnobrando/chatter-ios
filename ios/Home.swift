@@ -55,6 +55,9 @@ class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
     }
 
     func getContacts() -> [Contact] {
+        // Make request to backend to get all of the user's chats.
+        
+        
         return [Contact(firstName: "Galt", lastName: "MacDermot", id: "1"), Contact(firstName: "Jacob", lastName: "Kim", id: "2")]
     }
     

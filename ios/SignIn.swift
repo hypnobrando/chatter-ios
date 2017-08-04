@@ -49,6 +49,11 @@ class SignIn: UIViewController, UITextFieldDelegate {
     
     func submitButtonTapped(sender: UIButton!) {
         
+        if firstName.text == nil || firstName.text == "" || lastName.text == nil || lastName.text == "" {
+            // TODO - warn user.
+            return
+        }
+        
         // Send data to backend.
         API.createUser(firstName: firstName.text!, lastName: lastName.text!, completion_handler: {
             (response, contact) -> Void in
