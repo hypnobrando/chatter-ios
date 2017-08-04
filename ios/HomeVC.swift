@@ -8,11 +8,11 @@
 
 import UIKit
 
-class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     let BOTTOM_MARGIN : CGFloat = 50.0
     
-    var contacts = [Contact]()
+    var chats = [Chat]()
     var table = UITableView()
     var connectButton = UIButton()
     var settingsButton = UIButton()
@@ -41,7 +41,7 @@ class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
         settingsButton.addTarget(self, action: #selector(settingsButtonPressed), for: .touchUpInside)
         
         // Get information from backend.
-        contacts = getContacts()
+        getChats()
         
         // Add views.
         view.addSubview(table)
@@ -54,15 +54,23 @@ class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
         // Dispose of any resources that can be recreated.
     }
 
-    func getContacts() -> [Contact] {
+    func getChats() {
         // Make request to backend to get all of the user's chats.
-        
-        
-        return [Contact(firstName: "Galt", lastName: "MacDermot", id: "1"), Contact(firstName: "Jacob", lastName: "Kim", id: "2")]
+        API.getUsersChats(userId: cache().user.id, completionHandler: {
+            (response, chats) -> Void in
+            
+            if response != URLResponse.Success {
+                print(response)
+                return
+            }
+
+            self.chats = chats!
+            self.table.reloadData()
+        })
     }
     
     func connectButtonPressed(sender: UIButton!) {
-        let connect = Connect()
+        let connect = ConnectVC()
         navigationController?.pushViewController(connect, animated: true)
     }
     
@@ -73,13 +81,13 @@ class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
     // UITableView DataSource
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return contacts.count
+        return chats.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let contact = contacts[indexPath.row]
+        let chat = chats[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
-        cell.name.text = contact.fullName()
+        cell.name.text = chat.getNamesExceptFor(user: cache().user)
         return cell
     }
     
@@ -90,9 +98,9 @@ class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let chat = Chat()
-        chat.incomingContact = contacts[indexPath.row]
-        navigationController?.pushViewController(chat, animated: true)
+        let chatVC = ChatVC()
+        chatVC.chat = chats[indexPath.row]
+        navigationController?.pushViewController(chatVC, animated: true)
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }

@@ -22,14 +22,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Load the cache if it exists.
         cache = Cache.loadUser()
-        cache.clear()
+        //cache.clear()
         var mainView : UIViewController
         if cache.loaded {
             mainView = UINavigationController()
-            let home = Home()
+            let home = HomeVC()
             (mainView as! UINavigationController).viewControllers = [home]
         } else {
-            mainView = SignIn()
+            mainView = SignInVC()
         }
         
         self.window!.rootViewController = mainView

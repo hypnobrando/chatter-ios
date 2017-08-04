@@ -32,4 +32,8 @@ class Contact {
     func stringID() -> String {
         return String(id)
     }
+    
+    class func deserialize(json: [String:String]) -> Contact {
+        return Contact(firstName: json["first_name"]!, lastName: json["last_name"]!, id: json["_id"]!)
+    }
 }

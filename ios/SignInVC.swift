@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SignIn: UIViewController, UITextFieldDelegate {
+class SignInVC: UIViewController, UITextFieldDelegate {
     
     let TOP_MARGIN = CGFloat(100.0)
     let LEFT_MARGIN = CGFloat(45.0)
@@ -55,7 +55,7 @@ class SignIn: UIViewController, UITextFieldDelegate {
         }
         
         // Send data to backend.
-        API.createUser(firstName: firstName.text!, lastName: lastName.text!, completion_handler: {
+        API.createUser(firstName: firstName.text!, lastName: lastName.text!, completionHandler: {
             (response, contact) -> Void in
             
             if response != URLResponse.Success {
@@ -65,11 +65,11 @@ class SignIn: UIViewController, UITextFieldDelegate {
             }
             
             // Cache the user info.
-            self.saveCacheToAppDelegate(cache: Cache.cacheUser(contact: Contact(firstName: self.firstName.text!, lastName: self.lastName.text!, id: "")))
+            self.saveCacheToAppDelegate(cache: Cache.cacheUser(contact: contact!))
             
             // Transition to next vc.
             let nav = UINavigationController()
-            let home = Home()
+            let home = HomeVC()
             nav.viewControllers = [home]
             self.present(nav, animated: true, completion: nil)
         })

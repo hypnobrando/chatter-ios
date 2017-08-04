@@ -17,45 +17,95 @@ class API {
     
     // Users
     
-    class func createUser(firstName: String, lastName: String, completion_handler: @escaping (URLResponse, Contact?) -> Void) {
-        
+    class func createUser(firstName: String, lastName: String, completionHandler: @escaping (URLResponse, Contact?) -> Void) {
         let json = ["first_name" : firstName, "last_name" : lastName]
         
         // Perform request.
-        API.perform_request(request_type: "POST", url_path: "users", json: json, token: nil, completion_handler: {
+        API.performRequest(requestType: "POST", urlPath: "users", json: json, token: nil, completionHandler: {
             (response, data) in
             
             if let _ = data as? URLResponse {
-                return completion_handler(URLResponse.ServerDown, nil)
+                return completionHandler(URLResponse.ServerDown, nil)
             }
             
             if response == nil {
-                return completion_handler(URLResponse.NotConnected, nil)
+                return completionHandler(URLResponse.NotConnected, nil)
             }
             
             let data = data as! [String : Any]
             if data["error"] != nil {
-                return completion_handler(URLResponse.Error, nil)
+                return completionHandler(URLResponse.Error, nil)
             }
             
-            let user = data["user"] as! [String : String]
-            let contact = Contact(firstName: user["first_name"]!, lastName: user["last_name"]!, id: user["_id"]!)
-            completion_handler(URLResponse.Success, contact)
+            let userJson = data["user"] as! [String : String]
+            let contact = Contact.deserialize(json: userJson)
+            completionHandler(URLResponse.Success, contact)
         })
     }
     
     // Chats
-    class func getUsersChats(userId: String, completion_handler: @escaping (URLResponse, Contact?) -> Void) {
-        
+    class func getUsersChats(userId: String, completionHandler: @escaping (URLResponse, [Chat]?) -> Void) {
+        API.performRequest(requestType: "GET", urlPath: "users/" + userId + "/chats", json: nil, token: nil, completionHandler: {
+            (response, data) in
+            
+            if let _ = data as? URLResponse {
+                return completionHandler(URLResponse.ServerDown, nil)
+            }
+            
+            if response == nil {
+                return completionHandler(URLResponse.NotConnected, nil)
+            }
+            
+            let data = data as! [String : Any]
+            if data["error"] != nil {
+                return completionHandler(URLResponse.Error, nil)
+            }
+            
+            let chatsJson = data["chats"] as! [[String : Any]]
+            let chats = chatsJson.map({ (chat) -> Chat in Chat.deserialize(json: chat)})
+            completionHandler(URLResponse.Success, chats)
+        })
+    }
+    
+    // Messages
+    
+    class func getChatMessages(chatId: String, completionHandler: @escaping (URLResponse, Chat?) -> Void) {
+        API.performRequest(requestType: "GET", urlPath: "chats/" + chatId + "/messages", json: nil, token: nil, completionHandler: {
+            (response, data) in
+            
+            if let _ = data as? URLResponse {
+                return completionHandler(URLResponse.ServerDown, nil)
+            }
+            
+            if response == nil {
+                return completionHandler(URLResponse.NotConnected, nil)
+            }
+            
+            let data = data as! [String : Any]
+            if data["error"] != nil {
+                return completionHandler(URLResponse.Error, nil)
+            }
+            
+            let messagesJson = data["messages"] as! [[String : Any]]
+            var chatJson = data["chat"] as! [String : Any]
+            let usersJson = data["users"] as! [[String : Any]]
+            chatJson["messages"] = messagesJson
+            chatJson["users"] = usersJson
+            
+            let chat = Chat.deserialize(json: chatJson)
+            
+            completionHandler(URLResponse.Success, chat)
+        })
     }
     
     // HELPERS
-    class func perform_request(request_type: String, url_path: String, json: [String: Any]?, token: String?,completion_handler: @escaping (HTTPURLResponse?, Any?) -> Void) {
+    
+    class func performRequest(requestType: String, urlPath: String, json: [String: Any]?, token: String?, completionHandler: @escaping (HTTPURLResponse?, Any?) -> Void) {
         
         // Make url request.
-        var request = URLRequest(url: URL(string: API.rootURLString + url_path)!)
-        request.httpMethod = request_type
-        if request_type == "POST" {
+        var request = URLRequest(url: URL(string: API.rootURLString + urlPath)!)
+        request.httpMethod = requestType
+        if requestType == "POST" {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
         
@@ -85,12 +135,12 @@ class API {
                     if error!.localizedDescription == "Could not connect to the server." {
                         print("couldnt connect to server")
                         return DispatchQueue.main.async {
-                            completion_handler(nil, URLResponse.ServerDown)
+                            completionHandler(nil, URLResponse.ServerDown)
                         }
                     }
                     
                     return DispatchQueue.main.async {
-                        completion_handler(nil, nil)
+                        completionHandler(nil, nil)
                     }
                 }
                 
@@ -105,7 +155,7 @@ class API {
                     }
                     
                     return DispatchQueue.main.async {
-                        completion_handler(http_response, json_response)
+                        completionHandler(http_response, json_response)
                     }
                 }
                 

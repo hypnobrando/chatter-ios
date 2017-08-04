@@ -9,7 +9,7 @@
 import UIKit
 import BluetoothKit
 
-class Connect: UIViewController, UITableViewDataSource, UITableViewDelegate, BKPeripheralDelegate, BKCentralDelegate, BKAvailabilityObserver {
+class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, BKPeripheralDelegate, BKCentralDelegate, BKAvailabilityObserver {
     
     let SERVICE_UUID = UUID(uuidString: "F9EBC788-4B19-4D78-93CA-1E55091782B1")!
     let CHARACTERISTIC_UUID = UUID(uuidString: "9739A28B-6096-4606-9F29-473A65862C85")!
