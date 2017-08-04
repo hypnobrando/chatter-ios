@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Load the cache if it exists.
         cache = Cache.loadUser()
-        //cache.clear()
+        cache.clear()
         var mainView : UIViewController
         if cache.loaded {
             mainView = UINavigationController()

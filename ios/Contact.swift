@@ -11,15 +11,15 @@ import Foundation
 class Contact {
     var firstName : String
     var lastName : String
-    var id : Int
+    var id : String
     
     init() {
         firstName = ""
         lastName = ""
-        id = -1
+        id = ""
     }
     
-    init(firstName: String, lastName: String, id: Int) {
+    init(firstName: String, lastName: String, id: String) {
         self.firstName = firstName
         self.lastName = lastName
         self.id = id

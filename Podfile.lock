@@ -1,7 +1,9 @@
 PODS:
+  - BluetoothKit (0.4.0)
   - JSQMessagesViewController (7.3.4)
 
 DEPENDENCIES:
+  - BluetoothKit (~> 0.4.0)
   - JSQMessagesViewController (from `https://github.com/jessesquires/JSQMessagesViewController.git`, branch `develop`)
 
 EXTERNAL SOURCES:
@@ -15,8 +17,9 @@ CHECKOUT OPTIONS:
     :git: https://github.com/jessesquires/JSQMessagesViewController.git
 
 SPEC CHECKSUMS:
+  BluetoothKit: 00e189e01ba765e2689c46fbd8d0ede62984441b
   JSQMessagesViewController: c11b9e77372ab72c45c67311f6da7342e32df1e8
 
-PODFILE CHECKSUM: d9f169514873a9d91721b473da32ead78c21722f
+PODFILE CHECKSUM: 24cd0c0c3ff586ce5f3bc226ef91762eec2747d6
 
 COCOAPODS: 1.2.0

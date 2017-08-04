@@ -50,15 +50,24 @@ class SignIn: UIViewController, UITextFieldDelegate {
     func submitButtonTapped(sender: UIButton!) {
         
         // Send data to backend.
-        
-        // Cache the user info.
-        saveCacheToAppDelegate(cache: Cache.cacheUser(contact: Contact(firstName: firstName.text!, lastName: lastName.text!, id: -1)))
-        
-        // Transition to next vc.
-        let nav = UINavigationController()
-        let home = Home()
-        nav.viewControllers = [home]
-        present(nav, animated: true, completion: nil)
+        API.createUser(firstName: firstName.text!, lastName: lastName.text!, completion_handler: {
+            (response, contact) -> Void in
+            
+            if response != URLResponse.Success {
+                // Do shit.
+                print(response)
+                return
+            }
+            
+            // Cache the user info.
+            self.saveCacheToAppDelegate(cache: Cache.cacheUser(contact: Contact(firstName: self.firstName.text!, lastName: self.lastName.text!, id: "")))
+            
+            // Transition to next vc.
+            let nav = UINavigationController()
+            let home = Home()
+            nav.viewControllers = [home]
+            self.present(nav, animated: true, completion: nil)
+        })
     }
     
     // UITextField Delegate

@@ -55,11 +55,12 @@ class Home: UIViewController, UITableViewDataSource, UITableViewDelegate {
     }
 
     func getContacts() -> [Contact] {
-        return [Contact(firstName: "Galt", lastName: "MacDermot", id: 1), Contact(firstName: "Jacob", lastName: "Kim", id: 2)]
+        return [Contact(firstName: "Galt", lastName: "MacDermot", id: "1"), Contact(firstName: "Jacob", lastName: "Kim", id: "2")]
     }
     
     func connectButtonPressed(sender: UIButton!) {
-        print("CONNECT BUTTON CLICKED")
+        let connect = Connect()
+        navigationController?.pushViewController(connect, animated: true)
     }
     
     func settingsButtonPressed(sender: UIButton!) {

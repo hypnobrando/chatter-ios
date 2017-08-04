@@ -30,7 +30,7 @@ class Cache {
             cache.user.lastName = lastName
         }
         if let id = cache.defaults.string(forKey: "id") {
-            cache.user.id = Int(id)!
+            cache.user.id = id
             cache.loaded = true
         }
         
@@ -41,7 +41,7 @@ class Cache {
         let cache = Cache(contact: contact)
         cache.defaults.setValue(contact.firstName, forKey: "first_name")
         cache.defaults.setValue(contact.lastName, forKey: "last_name")
-        cache.defaults.setValue(String(contact.id), forKey: "id")
+        cache.defaults.setValue(contact.id, forKey: "id")
         cache.defaults.synchronize()
         
         return cache
