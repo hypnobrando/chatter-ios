@@ -54,8 +54,14 @@ class SignInVC: UIViewController, UITextFieldDelegate {
             return
         }
         
+        let apnToken = self.apnToken()
+        if apnToken == "" {
+            // TODO - warn user.
+            return
+        }
+        
         // Send data to backend.
-        API.createUser(firstName: firstName.text!, lastName: lastName.text!, completionHandler: {
+        API.createUser(firstName: firstName.text!, lastName: lastName.text!, apnToken: apnToken, completionHandler: {
             (response, contact) -> Void in
             
             if response != URLResponse.Success {

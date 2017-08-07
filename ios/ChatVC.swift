@@ -12,9 +12,13 @@ class ChatVC: JSQMessagesViewController {
     
     var chat = Chat()
     var messages = [JSQMessage]()
+    var enc = Encryption()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Load encryption from cache.
+        enc = Encryption(chat: chat, cache: cache())
         
         // Set up background.
         view.backgroundColor = UIColor.white
@@ -51,7 +55,7 @@ class ChatVC: JSQMessagesViewController {
             self.chat = chat!
             self.messages = self.chat.messages.map({
                 (message) -> JSQMessage in
-                JSQMessage(senderId: message.user.id, senderDisplayName: message.user.fullName(), date: message.timeStamp, text:message.message)
+                JSQMessage(senderId: message.user.id, senderDisplayName: message.user.fullName(), date: message.timeStamp, text: self.enc.decrypt(message: message.message))
             })
             self.collectionView?.reloadData()
             self.finishReceivingMessage()
@@ -116,7 +120,8 @@ class ChatVC: JSQMessagesViewController {
     
     override func didPressSend(_ button: UIButton, withMessageText text: String, senderId: String, senderDisplayName: String, date: Date) {
         // Send message to backend.
-        API.createMessage(userId: senderId, chatId: chat.id, message: text, completionHandler: {
+        let encrypted = enc.encrypt(message: text)
+        API.createMessage(userId: senderId, chatId: chat.id, message: encrypted, completionHandler: {
             (response, _) in
             
             if response != URLResponse.Success {
@@ -127,6 +132,14 @@ class ChatVC: JSQMessagesViewController {
             self.addMessage(withId: senderId, name: senderDisplayName, text: text)
             self.finishSendingMessage()
         })
+    }
+    
+    override func pushNotificationReceived(payload: [String:Any]) {
+        if let chatId = payload["chat_id"] as? String {
+            if chatId == self.chat.id {
+                loadMessages()
+            }
+        }
     }
     
     /*

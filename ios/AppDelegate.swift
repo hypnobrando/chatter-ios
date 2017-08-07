@@ -15,6 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var cache = Cache()
     var window: UIWindow?
+    var apnToken = ""
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -30,7 +31,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Load the cache if it exists.
         cache = Cache.loadUser()
+        
         //cache.clear()
+        //let key = Encryption.createKey()
+        //cache.setChatKey(chatId: "5988ac1904457f00010db700", key: key.key)
+        
         var mainView : UIViewController
         if cache.loaded {
             mainView = UINavigationController()
@@ -47,11 +52,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        print("DEVICE TOKEN = \(deviceToken)")
+        let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        self.apnToken = token
     }
     
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print(error)
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        if let nav = self.window!.rootViewController as? UINavigationController {
+            if let payload = userInfo as? [String : Any] {
+                nav.visibleViewController?.pushNotificationReceived(payload: payload)
+            }
+        }
+        completionHandler(.newData)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

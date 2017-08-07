@@ -1,8 +1,10 @@
 PODS:
+  - AES256CBC (1.1.1)
   - BluetoothKit (0.4.0)
   - JSQMessagesViewController (7.3.4)
 
 DEPENDENCIES:
+  - AES256CBC
   - BluetoothKit (~> 0.4.0)
   - JSQMessagesViewController (from `https://github.com/jessesquires/JSQMessagesViewController.git`, branch `develop`)
 
@@ -17,9 +19,10 @@ CHECKOUT OPTIONS:
     :git: https://github.com/jessesquires/JSQMessagesViewController.git
 
 SPEC CHECKSUMS:
+  AES256CBC: 22b584fbea28b46ab3c52d44213902ab5c6f801f
   BluetoothKit: 00e189e01ba765e2689c46fbd8d0ede62984441b
   JSQMessagesViewController: c11b9e77372ab72c45c67311f6da7342e32df1e8
 
-PODFILE CHECKSUM: 24cd0c0c3ff586ce5f3bc226ef91762eec2747d6
+PODFILE CHECKSUM: f75d549a620d13d182820b36a13f8d43ab32936b
 
 COCOAPODS: 1.2.0

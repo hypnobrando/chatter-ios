@@ -25,6 +25,7 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        BT_LOCAL_NAME = cache().user.fullName()
         
         // Setup the view.
         table = UITableView(frame: CGRect(x: view.frame.origin.x, y: view.frame.origin.y, width: view.frame.width, height: view.frame.height))

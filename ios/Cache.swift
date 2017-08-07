@@ -33,6 +33,9 @@ class Cache {
             cache.user.id = id
             cache.loaded = true
         }
+        if let apnToken = cache.defaults.string(forKey: "apn_token") {
+            cache.user.apnToken = apnToken
+        }
         
         return cache
     }
@@ -42,6 +45,7 @@ class Cache {
         cache.defaults.setValue(contact.firstName, forKey: "first_name")
         cache.defaults.setValue(contact.lastName, forKey: "last_name")
         cache.defaults.setValue(contact.id, forKey: "id")
+        cache.defaults.setValue(contact.apnToken, forKey: "apn_token")
         cache.defaults.synchronize()
         
         return cache
@@ -51,8 +55,18 @@ class Cache {
         defaults.removeObject(forKey: "first_name")
         defaults.removeObject(forKey: "last_name")
         defaults.removeObject(forKey: "id")
+        defaults.removeObject(forKey: "apn_token")
 
         loaded = false
         user = Contact()
+    }
+    
+    func chatKey(chatId: String) -> String? {
+        return defaults.string(forKey: "Key: \(chatId)")
+    }
+    
+    func setChatKey(chatId: String, key: String) {
+        defaults.setValue(key, forKey: "Key: \(chatId)")
+        defaults.synchronize()
     }
 }

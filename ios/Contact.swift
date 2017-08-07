@@ -12,17 +12,20 @@ class Contact {
     var firstName : String
     var lastName : String
     var id : String
+    var apnToken : String
     
     init() {
         firstName = ""
         lastName = ""
         id = ""
+        apnToken = ""
     }
     
-    init(firstName: String, lastName: String, id: String) {
+    init(firstName: String, lastName: String, id: String, apnToken: String) {
         self.firstName = firstName
         self.lastName = lastName
         self.id = id
+        self.apnToken = apnToken
     }
     
     func fullName() -> String {
@@ -34,6 +37,7 @@ class Contact {
     }
     
     class func deserialize(json: [String:String]) -> Contact {
-        return Contact(firstName: json["first_name"]!, lastName: json["last_name"]!, id: json["_id"]!)
+        print(json)
+        return Contact(firstName: json["first_name"]!, lastName: json["last_name"]!, id: json["_id"]!, apnToken: json["apn_token"]!)
     }
 }

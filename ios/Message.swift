@@ -26,12 +26,17 @@ class Message {
     }
     
     class func deserialize(json: [String:Any], user: Contact) -> Message {
+        // Parse timestamp
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
         dateFormatter.timeZone = NSTimeZone(abbreviation: "UTC") as TimeZone!
         let parsedTimetamp = String((json["timestamp"] as! String).characters.dropLast(3))
         let date = dateFormatter.date(from: parsedTimetamp)!
-        return Message(user: user, message: json["message"] as! String, timeStamp: date)
+        
+        // Decrypt Message
+        let message = json["message"] as! String
+        
+        return Message(user: user, message: message, timeStamp: date)
     }
         
 }

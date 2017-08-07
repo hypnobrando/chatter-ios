@@ -11,15 +11,12 @@ import Foundation
 class API {
     
     // ROOT URL
-    //static let environment = ProcessInfo().environment["ENV"] == nil ? "production" : ProcessInfo().environment["ENV"]!
-    //static let rootURLString : String = environment != "development" ? "https://chatter-" + environment + ".herokuapp.com/" : "http://127.0.0.1:8080/"
-    static let rootURLString : String = "http://127.0.0.1:8080/"
+    static let environment = ProcessInfo().environment["ENV"] == nil ? "development" : ProcessInfo().environment["ENV"]!
+    static let rootURLString : String = environment == "development" ? "http://127.0.0.1:8080/" : ProcessInfo().environment["URL"]!
     
-    // Users
-    
-    class func createUser(firstName: String, lastName: String, completionHandler: @escaping (URLResponse, Contact?) -> Void) {
-        let json = ["first_name" : firstName, "last_name" : lastName]
-        
+    class func createUser(firstName: String, lastName: String, apnToken: String, completionHandler: @escaping (URLResponse, Contact?) -> Void) {
+        let json = ["first_name" : firstName, "last_name" : lastName, "apn_token" : apnToken]
+
         // Perform request.
         API.performRequest(requestType: "POST", urlPath: "users", json: json, token: nil, completionHandler: {
             (response, data) in
@@ -45,7 +42,7 @@ class API {
     
     // Chats
     class func getUsersChats(userId: String, completionHandler: @escaping (URLResponse, [Chat]?) -> Void) {
-        API.performRequest(requestType: "GET", urlPath: "users/" + userId + "/chats", json: nil, token: nil, completionHandler: {
+        API.performRequest(requestType: "GET", urlPath: "users/\(userId)/chats", json: nil, token: nil, completionHandler: {
             (response, data) in
             
             if let _ = data as? URLResponse {
@@ -70,7 +67,7 @@ class API {
     // Messages
     
     class func getChatMessages(chatId: String, completionHandler: @escaping (URLResponse, Chat?) -> Void) {
-        API.performRequest(requestType: "GET", urlPath: "chats/" + chatId + "/messages", json: nil, token: nil, completionHandler: {
+        API.performRequest(requestType: "GET", urlPath: "chats/\(chatId)/messages", json: nil, token: nil, completionHandler: {
             (response, data) in
             
             if let _ = data as? URLResponse {
@@ -97,7 +94,7 @@ class API {
     class func createMessage(userId: String, chatId: String, message: String, completionHandler: @escaping (URLResponse, Chat?) -> Void) {
         let json = ["message": message]
         
-        API.performRequest(requestType: "POST", urlPath: "users/" + userId + "/chats/" + chatId + "/messages", json: json, token: nil, completionHandler: {
+        API.performRequest(requestType: "POST", urlPath: "users/\(userId)/chats/\(chatId)/messages", json: json, token: nil, completionHandler: {
             (response, data) in
             
             if let _ = data as? URLResponse {
