@@ -32,7 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Load the cache if it exists.
         cache = Cache.loadUser()
         
-        //cache.clear()
+        cache.clear()
         //let key = Encryption.createKey()
         //cache.setChatKey(chatId: "5988ac1904457f00010db700", key: key.key)
         

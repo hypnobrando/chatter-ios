@@ -39,7 +39,7 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
         broadcastBT()
         central.delegate = self
         central.addAvailabilityObserver(self)
-        
+        listenBT()
         view.addSubview(table)
     }
 
@@ -82,10 +82,12 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
     // Bluetooth Peripheral Delegate
     
     func peripheral(_ peripheral: BKPeripheral, remoteCentralDidConnect remoteCentral: BKRemoteCentral) {
+        print("remoteCentralDidConnect")
         return
     }
     
     func peripheral(_ peripheral: BKPeripheral, remoteCentralDidDisconnect remoteCentral: BKRemoteCentral) {
+        print("remoteCentralDidDisconnect")
         return
     }
     
@@ -98,7 +100,10 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
     // Bluetooth Availability Observer Delegate
     
     func availabilityObserver(_ availabilityObservable: BKAvailabilityObservable, availabilityDidChange availability: BKAvailability) {
-        return
+        if availability != BKAvailability.available {
+            print("Please turn on bluetooth.")
+            return
+        }
     }
     
     func availabilityObserver(_ availabilityObservable: BKAvailabilityObservable, unavailabilityCauseDidChange unavailabilityCause: BKUnavailabilityCause) {
@@ -109,7 +114,7 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
     
     func broadcastBT() {
         do {
-            let configuration = BKPeripheralConfiguration(dataServiceUUID: SERVICE_UUID, dataServiceCharacteristicUUID: 	CHARACTERISTIC_UUID, localName: BT_LOCAL_NAME)
+            let configuration = BKPeripheralConfiguration(dataServiceUUID: SERVICE_UUID, dataServiceCharacteristicUUID: CHARACTERISTIC_UUID, localName: BT_LOCAL_NAME)
             try peripheral.startWithConfiguration(configuration)
         } catch let error {
             // TODO - Handle error.
