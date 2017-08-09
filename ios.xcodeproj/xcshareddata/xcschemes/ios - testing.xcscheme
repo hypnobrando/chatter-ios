@@ -64,7 +64,7 @@
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "URL"
-            value = "http://api.chatter-testing.bep-projects.com/"
+            value = "https://api.chatter-testing.bep-projects.com/"
             isEnabled = "YES">
          </EnvironmentVariable>
          <EnvironmentVariable
