@@ -20,4 +20,25 @@ extension UIViewController {
         alertView.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
         self.present(alertView, animated: true, completion: nil)
     }
+    
+    func pushSpinner(message: String, frame: CGRect) {
+        let spinnerView = Spinner(frame: frame)
+        spinnerView.backgroundColor = UIColor.clear
+        
+        let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        spinner.frame = CGRect(x: spinnerView.bounds.midX - spinner.frame.width / 2.0, y: spinnerView.bounds.midY - spinner.frame.height / 2.0, width: spinner.frame.width, height: spinner.frame.height)
+        spinner.startAnimating()
+        
+        spinnerView.addSubview(spinner)
+        view.addSubview(spinnerView)
+    }
+    
+    func removeSpinner() {
+        _ = view.subviews.map({
+            (subView) -> Void in
+            if let spinner = subView as? Spinner {
+                spinner.removeFromSuperview()
+            }
+        })
+    }
 }

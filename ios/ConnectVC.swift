@@ -19,7 +19,7 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
     
     var table = UITableView()
     var button = Button()
-    var remotePeripherals = [BKRemotePeripheral]()
+    var discoveries = [BKDiscovery]()
     var peripheral = BKPeripheral()
     var central = BKCentral()
     var remoteCentral : BKRemoteCentral? = nil
@@ -71,13 +71,13 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
     // UITableView DataSource
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return remotePeripherals.count
+        return discoveries.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let remotePeripheral = remotePeripherals[indexPath.row]
+        let discovery = discoveries[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
-        cell.name.text = remotePeripheral.name!
+        cell.name.text = discovery.localName
         return cell
     }
     
@@ -87,12 +87,16 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
         return UITableViewAutomaticDimension
     }
     
+    // 1 - Central
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let remotePeripheral = remotePeripherals[indexPath.row]
-        central.connect(remotePeripheral: remotePeripheral, completionHandler: {
+        let discovery = discoveries[indexPath.row]
+        pushSpinner(message: "", frame: table.frame)
+        central.connect(remotePeripheral: discovery.remotePeripheral, completionHandler: {
             (remotePeripheral, error) in
             if error != nil {
                 // Handle error.
+                print(error)
+                return
             }
 
             // If no error, you're ready to receive data!
@@ -109,18 +113,27 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
         let type = components[0]
         
         switch type {
+        
+        // 4a - Central
         case "user_id_and_key":
             let remoteUserId = components[1]
             let key = components[2]
             handleUserIdAndKey(remoteUserId: remoteUserId, key: key, remotePeer: remotePeer)
+            
+        // 5a - Peripheral
         case "chat_id":
             let chatId = components[1]
             handleChatId(chatId: chatId)
+            
+        case "disconnect":
+            table.deselectRow(at: table.indexPathForSelectedRow!, animated: true)
+            
         default:
-            print("what the fuck?")
+            print("what the heck?")
         }
     }
     
+    // 4b - Central
     func handleUserIdAndKey(remoteUserId: String, key: String, remotePeer: BKRemotePeer) {
         // Create new chat.
         API.createChat(userIds: [remoteUserId, Cache.loadUser().id], completionHandler: {
@@ -146,14 +159,18 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
                 Cache.setChatKey(chatId: chat!.id, key: key)
                 
                 // Go back to main menu.
+                self.removeSpinner()
                 self.goToMainMenu()
             })
         })
     }
     
+    // 5b - Peripheral
     func handleChatId(chatId: String) {
         // Cache chat id.
         Cache.setChatKey(chatId: chatId, key: self.key)
+        
+        removeSpinner()
         
         // Go back to main menu.
         self.goToMainMenu()
@@ -161,15 +178,24 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
 
     // Bluetooth Peripheral Delegate
     
+    // 2 - Peripheral
     func peripheral(_ peripheral: BKPeripheral, remoteCentralDidConnect remoteCentral: BKRemoteCentral) {
         // Find which user this is.
-        let connectedPeripheral = remotePeripherals.first(where: {
-            (peripheral) -> Bool in
-            peripheral.identifier == remoteCentral.identifier
+        
+        let connectedDiscovery = discoveries.first(where: {
+            (discovery) -> Bool in
+            discovery.remotePeripheral.identifier == remoteCentral.identifier
         })
-        let name = connectedPeripheral!.name!
+        
+        if connectedDiscovery == nil {
+            peripheral.sendData("disconnect".data(using: .utf8)!, toRemotePeer: remoteCentral, completionHandler: nil)
+            return
+        }
+
+        let name = connectedDiscovery!.localName!
         
         // Ask user if they want to send data.
+        pushSpinner(message: "", frame: table.frame)
         button.backgroundColor = UIColor.red
         button.setTitle("Connect to \(name)?", for: .normal)
         button.currentState = ButtonStates.ReadyToConnect.hashValue
@@ -245,11 +271,11 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
                     return
                 }
                 
-                self.remotePeripherals = discoveries.map({
-                    (discovery) -> BKRemotePeripheral in
-                    return discovery.remotePeripheral
+                // Reload table data.
+                self.discoveries = discoveries.filter({
+                    (discovery) -> Bool in
+                    discovery.localName != nil
                 })
-                
                 self.table.reloadData()
                 
             }, stateHandler: { newState in
@@ -269,6 +295,7 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
             button.setTitle("Search", for: .normal)
             button.currentState = ButtonStates.Idle.hashValue
             
+        // 3 - Peripheral
         case ButtonStates.ReadyToConnect.hashValue:
             
             // Generate key for chat.
@@ -288,10 +315,11 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
             })
             
         default:
-            print("what the fuck?")
+            print("what the heck?")
         }
     }
     
+    // 6
     func goToMainMenu() {
         do {
             try central.stop()

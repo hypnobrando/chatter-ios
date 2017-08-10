@@ -20,6 +20,7 @@
 		A82D16861F3255320088B59D /* ContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82D16851F3255320088B59D /* ContactCell.swift */; };
 		A880EB391F3C0DE000340B2C /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A880EB381F3C0DE000340B2C /* SettingsVC.swift */; };
 		A880EB3B1F3C193300340B2C /* Env.swift in Sources */ = {isa = PBXBuildFile; fileRef = A880EB3A1F3C193300340B2C /* Env.swift */; };
+		A880EB3F1F3C412800340B2C /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A880EB3E1F3C412800340B2C /* Spinner.swift */; };
 		A89D29081F3B8DE7003559D6 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89D29071F3B8DE7003559D6 /* Button.swift */; };
 		A8AFBC881F324C9A007A5FEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */; };
 		A8AFBC8A1F324C9A007A5FEE /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8AFBC891F324C9A007A5FEE /* HomeVC.swift */; };
@@ -46,6 +47,7 @@
 		A82D16851F3255320088B59D /* ContactCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactCell.swift; sourceTree = "<group>"; };
 		A880EB381F3C0DE000340B2C /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		A880EB3A1F3C193300340B2C /* Env.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Env.swift; sourceTree = "<group>"; };
+		A880EB3E1F3C412800340B2C /* Spinner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
 		A89D29071F3B8DE7003559D6 /* Button.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		A8AFBC841F324C9A007A5FEE /* ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 				A82974BD1F3286D200DC7B7A /* +UIViewController.swift */,
 				A82974BF1F32AE7B00DC7B7A /* TextField.swift */,
 				A89D29071F3B8DE7003559D6 /* Button.swift */,
+				A880EB3E1F3C412800340B2C /* Spinner.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -346,6 +349,7 @@
 				A82974BB1F32837300DC7B7A /* Cache.swift in Sources */,
 				A89D29081F3B8DE7003559D6 /* Button.swift in Sources */,
 				A82974D11F353BF200DC7B7A /* Encryption.swift in Sources */,
+				A880EB3F1F3C412800340B2C /* Spinner.swift in Sources */,
 				A8AFBC9E1F324E96007A5FEE /* ChatVC.swift in Sources */,
 				A82974CA1F346F3800DC7B7A /* Chat.swift in Sources */,
 				A8AFBC8A1F324C9A007A5FEE /* HomeVC.swift in Sources */,

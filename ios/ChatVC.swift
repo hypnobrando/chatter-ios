@@ -13,6 +13,7 @@ class ChatVC: JSQMessagesViewController {
     var chat = Chat()
     var messages = [JSQMessage]()
     var enc = Encryption()
+    var sending = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -119,18 +120,25 @@ class ChatVC: JSQMessagesViewController {
     }
     
     override func didPressSend(_ button: UIButton, withMessageText text: String, senderId: String, senderDisplayName: String, date: Date) {
+        if sending {
+            return
+        }
+        
         // Send message to backend.
+        sending = true
+        self.addMessage(withId: senderId, name: senderDisplayName, text: text)
+        self.finishSendingMessage()
+        
         let encrypted = enc.encrypt(message: text)
         API.createMessage(userId: senderId, chatId: chat.id, message: encrypted, completionHandler: {
             (response, _) in
+            self.sending = false
             
             if response != URLResponse.Success {
-            print(response)
-            return
+                print(response)
+                self.loadMessages()
+                return
             }
-            
-            self.addMessage(withId: senderId, name: senderDisplayName, text: text)
-            self.finishSendingMessage()
         })
     }
     
