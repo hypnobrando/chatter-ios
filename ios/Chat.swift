@@ -26,10 +26,16 @@ class Chat {
     }
     
     class func deserialize(json: [String:Any]) -> Chat {
-        let users = (json["users"] as! [[String:String]]).map({
-            json -> Contact in
-            Contact.deserialize(json: json)
-        })
+        
+        var users = [Contact]()
+        
+        if let jsonUsers = json["users"] as? [[String:String]] {
+            users = jsonUsers.map({
+                json -> Contact in
+                Contact.deserialize(json: json)
+            })
+        }
+        
         
         var messages = [Message]()
         if let messageJson = json["messages"] as? [[String:Any]] {

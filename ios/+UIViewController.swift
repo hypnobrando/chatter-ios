@@ -10,19 +10,14 @@ import Foundation
 import UIKit
 
 extension UIViewController {
-    func apnToken() -> String {
-        return (UIApplication.shared.delegate as! AppDelegate).apnToken
-    }
-    
-    func cache() -> Cache {
-        return (UIApplication.shared.delegate as! AppDelegate).cache
-    }
-    
-    func saveCacheToAppDelegate(cache: Cache) {
-        (UIApplication.shared.delegate as! AppDelegate).cache = cache
-    }
     
     func pushNotificationReceived(payload: [String:Any]) {
         print(payload)
+    }
+    
+    func pushAlertView(title: String, message: String) {
+        let alertView = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertView.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
+        self.present(alertView, animated: true, completion: nil)
     }
 }

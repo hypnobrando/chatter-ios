@@ -40,4 +40,8 @@ class Contact {
         print(json)
         return Contact(firstName: json["first_name"]!, lastName: json["last_name"]!, id: json["_id"]!, apnToken: json["apn_token"]!)
     }
+    
+    func isEmpty() -> Bool {
+        return id == ""
+    }
 }

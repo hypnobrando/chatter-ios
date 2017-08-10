@@ -11,8 +11,10 @@ import Foundation
 class API {
     
     // ROOT URL
-    static let environment = ProcessInfo().environment["ENV"] == nil ? "development" : ProcessInfo().environment["ENV"]!
-    static let rootURLString : String = environment == "development" ? "http://127.0.0.1:8080/" : ProcessInfo().environment["URL"]!
+    //static let environment = ProcessInfo().environment["ENV"] == nil ? "development" : ProcessInfo().environment["ENV"]!
+    //static let rootURLString : String = environment == "development" ? "http://127.0.0.1:8080/" : ProcessInfo().environment["URL"]!
+    static let environment = ENV
+    static let rootURLString = CHATTER_URL
     
     class func createUser(firstName: String, lastName: String, apnToken: String, completionHandler: @escaping (URLResponse, Contact?) -> Void) {
         let json = ["first_name" : firstName, "last_name" : lastName, "apn_token" : apnToken]
@@ -113,6 +115,30 @@ class API {
             let chatJson = loadMessageFromData(data: data)
             let chat = Chat.deserialize(json: chatJson)
             
+            completionHandler(URLResponse.Success, chat)
+        })
+    }
+    
+    class func createChat(userIds: [String], completionHandler: @escaping (URLResponse, Chat?) -> Void) {
+        let json = ["user_ids": userIds]
+        
+        API.performRequest(requestType: "POST", urlPath: "chats", json: json, token: nil, completionHandler: {
+            (response, data) in
+            
+            if let _ = data as? URLResponse {
+                return completionHandler(URLResponse.ServerDown, nil)
+            }
+            
+            if response == nil {
+                return completionHandler(URLResponse.NotConnected, nil)
+            }
+            
+            let data = data as! [String : Any]
+            if data["error"] != nil {
+                return completionHandler(URLResponse.Error, nil)
+            }
+            print(data)
+            let chat = Chat.deserialize(json: data["chat"] as! [String : Any])
             completionHandler(URLResponse.Success, chat)
         })
     }

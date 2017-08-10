@@ -9,38 +9,58 @@
 import UIKit
 import BluetoothKit
 
-class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, BKPeripheralDelegate, BKCentralDelegate, BKAvailabilityObserver {
+class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, BKPeripheralDelegate, BKCentralDelegate, BKAvailabilityObserver, BKRemotePeerDelegate {
     
-    let SERVICE_UUID = UUID(uuidString: "F9EBC788-4B19-4D78-93CA-1E55091782B1")!
-    let CHARACTERISTIC_UUID = UUID(uuidString: "9739A28B-6096-4606-9F29-473A65862C85")!
-    var BT_LOCAL_NAME = ""
-    
+    let SERVICE_UUID = UUID(uuidString: "2F6D474A-C5C5-4E39-837D-00C98A87E458")!
+    let CHARACTERISTIC_UUID = UUID(uuidString: "EBB708B1-154D-4F9A-AF0A-B4CF1B05D5DF")!
+    var BT_LOCAL_NAME = "Chatter Peripheral"
+    let BUTTON_HEIGHT : CGFloat = 50.0
+    var key = ""
     
     var table = UITableView()
+    var button = Button()
     var remotePeripherals = [BKRemotePeripheral]()
     var peripheral = BKPeripheral()
     var central = BKCentral()
+    var remoteCentral : BKRemoteCentral? = nil
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        BT_LOCAL_NAME = cache().user.fullName()
         
         // Setup the view.
-        table = UITableView(frame: CGRect(x: view.frame.origin.x, y: view.frame.origin.y, width: view.frame.width, height: view.frame.height))
+        self.navigationItem.hidesBackButton = true
+        let newBackButton = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(back))
+        self.navigationItem.leftBarButtonItem = newBackButton
+        
+        view.backgroundColor = UIColor.white
+        let navBarHeight = navigationController!.navigationBar.frame.height + navigationController!.navigationBar.frame.origin.y
+        table = UITableView(frame: CGRect(x: view.frame.origin.x, y: view.frame.origin.y + navBarHeight, width: view.frame.width, height: view.frame.height - BUTTON_HEIGHT - navBarHeight))
         table.register(ContactCell.self, forCellReuseIdentifier: "ContactCell")
         table.dataSource = self
         table.delegate = self
+        button = Button(frame: CGRect(x: view.frame.origin.x, y: table.frame.maxY, width: view.frame.width, height: BUTTON_HEIGHT))
+        button.backgroundColor = UIColor.blue
+        button.setTitle("Search", for: .normal)
+        button.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
+        button.currentState = ButtonStates.Idle.hashValue
         
         // Setup bluetooth.
-        BT_LOCAL_NAME = cache().user.fullName()
+        BT_LOCAL_NAME = Cache.loadUser().fullName()
         peripheral.delegate = self
         broadcastBT()
         central.delegate = self
         central.addAvailabilityObserver(self)
         listenBT()
+        
+        // Add subviews
+        view.addSubview(button)
         view.addSubview(table)
+    }
+    
+    func back(sender: UIBarButtonItem) {
+        goToMainMenu()
     }
 
     override func didReceiveMemoryWarning() {
@@ -70,20 +90,90 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let remotePeripheral = remotePeripherals[indexPath.row]
         central.connect(remotePeripheral: remotePeripheral, completionHandler: {
-            remotePeripheral, error in
+            (remotePeripheral, error) in
             if error != nil {
                 // Handle error.
             }
 
-            // If no error, you're ready to receive data!)
+            // If no error, you're ready to receive data!
+            remotePeripheral.delegate = self
         })
+    }
+    
+    // Bluetooth Remote Peripheral Delegate
+    
+    func remotePeer(_ remotePeer: BKRemotePeer, didSendArbitraryData data: Data) {
+        // Parse data.
+        let dataString = String(data: data, encoding: String.Encoding.utf8)!
+        let components = dataString.components(separatedBy: " ")
+        let type = components[0]
+        
+        switch type {
+        case "user_id_and_key":
+            let remoteUserId = components[1]
+            let key = components[2]
+            handleUserIdAndKey(remoteUserId: remoteUserId, key: key, remotePeer: remotePeer)
+        case "chat_id":
+            let chatId = components[1]
+            handleChatId(chatId: chatId)
+        default:
+            print("what the fuck?")
+        }
+    }
+    
+    func handleUserIdAndKey(remoteUserId: String, key: String, remotePeer: BKRemotePeer) {
+        // Create new chat.
+        API.createChat(userIds: [remoteUserId, Cache.loadUser().id], completionHandler: {
+            (response, chat) in
+            
+            if response != URLResponse.Success {
+                print(response)
+                return
+            }
+            
+            let dataString = "chat_id \(chat!.id)"
+            
+            // Send chat id to peripheral.
+            self.central.sendData(dataString.data(using: .utf8)!, toRemotePeer: remotePeer, completionHandler: {
+                (data, peer, error) in
+                
+                if error != nil {
+                    print(error)
+                    return
+                }
+                
+                // Cache chat id and key.
+                Cache.setChatKey(chatId: chat!.id, key: key)
+                
+                // Go back to main menu.
+                self.goToMainMenu()
+            })
+        })
+    }
+    
+    func handleChatId(chatId: String) {
+        // Cache chat id.
+        Cache.setChatKey(chatId: chatId, key: self.key)
+        
+        // Go back to main menu.
+        self.goToMainMenu()
     }
 
     // Bluetooth Peripheral Delegate
     
     func peripheral(_ peripheral: BKPeripheral, remoteCentralDidConnect remoteCentral: BKRemoteCentral) {
-        print("remoteCentralDidConnect")
-        return
+        // Find which user this is.
+        let connectedPeripheral = remotePeripherals.first(where: {
+            (peripheral) -> Bool in
+            peripheral.identifier == remoteCentral.identifier
+        })
+        let name = connectedPeripheral!.name!
+        
+        // Ask user if they want to send data.
+        button.backgroundColor = UIColor.red
+        button.setTitle("Connect to \(name)?", for: .normal)
+        button.currentState = ButtonStates.ReadyToConnect.hashValue
+        self.remoteCentral = remoteCentral
     }
     
     func peripheral(_ peripheral: BKPeripheral, remoteCentralDidDisconnect remoteCentral: BKRemoteCentral) {
@@ -94,6 +184,7 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
     // Bluetooth Central Delegate
     
     func central(_ central: BKCentral, remotePeripheralDidDisconnect remotePeripheral: BKRemotePeripheral) {
+        print("remotePeripheralDidDisconnect")
         return
     }
     
@@ -133,31 +224,87 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
             print(error)
             return
         }
+    }
+    
+    func buttonClicked(sender: UIButton!) {
         
-        central.scanContinuouslyWithChangeHandler({ changes, discoveries in
-            // Handle changes to "availabile" discoveries, [BKDiscoveriesChange].
-            // Handle current "available" discoveries, [BKDiscovery].
-            // This is where you'd ie. update a table view.
+        switch button.currentState {
+        case ButtonStates.Idle.hashValue:
             
-            if changes.count == 0 {
-                return
-            }
-            
-            self.remotePeripherals = discoveries.map({
-                (discovery) -> BKRemotePeripheral in
-                return discovery.remotePeripheral
+            // User wants to start searching so lets do it baby.
+            button.setTitle("Stop", for: .normal)
+            button.currentState = ButtonStates.Searching.hashValue
+            central.scanContinuouslyWithChangeHandler({
+                (changes, discoveries) in
+                // Handle changes to "availabile" discoveries, [BKDiscoveriesChange].
+                // Handle current "available" discoveries, [BKDiscovery].
+                // This is where you'd ie. update a table view.
+                print(changes, discoveries)
+                
+                if changes.count == 0 {
+                    return
+                }
+                
+                self.remotePeripherals = discoveries.map({
+                    (discovery) -> BKRemotePeripheral in
+                    return discovery.remotePeripheral
+                })
+                
+                self.table.reloadData()
+                
+            }, stateHandler: { newState in
+                // Handle newState, BKCentral.ContinuousScanState.
+                // This is where you'd ie. start/stop an activity indicator.
+                print(newState)
+                
+            }, duration: 3, inBetweenDelay: 3, errorHandler: { error in
+                // Handle error.
+                print(error)
             })
             
-            self.table.reloadData()
+        case ButtonStates.Searching.hashValue:
             
-        }, stateHandler: { newState in
-            // Handle newState, BKCentral.ContinuousScanState.
-            // This is where you'd ie. start/stop an activity indicator.
+            // User wants to stop searching..
+            central.interruptScan()
+            button.setTitle("Search", for: .normal)
+            button.currentState = ButtonStates.Idle.hashValue
             
+        case ButtonStates.ReadyToConnect.hashValue:
             
-        }, duration: 3, inBetweenDelay: 3, errorHandler: { error in
-            // Handle error.
+            // Generate key for chat.
+            self.key = Encryption.createKey().key
             
-        })
+            // Generate data that will be sent to central.
+            let dataString = "user_id_and_key \(Cache.loadUser().id) \(key)"
+            
+            // Send data baby.
+            peripheral.sendData(dataString.data(using: .utf8)!, toRemotePeer: self.remoteCentral!, completionHandler: {
+                (data, remotePeer, error) -> Void in
+                if error != nil {
+                    print(error)
+                    return
+                }
+                remotePeer.delegate = self
+            })
+            
+        default:
+            print("what the fuck?")
+        }
     }
+    
+    func goToMainMenu() {
+        do {
+            try central.stop()
+            try peripheral.stop()
+        } catch let error {
+            print(error)
+        }
+        navigationController!.popViewController(animated: true)
+    }
+}
+
+enum ButtonStates {
+    case Idle
+    case Searching
+    case ReadyToConnect
 }

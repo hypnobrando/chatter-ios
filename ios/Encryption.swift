@@ -17,8 +17,8 @@ class Encryption {
         key = ""
     }
     
-    init(chat: Chat, cache: Cache) {
-        if let key = cache.chatKey(chatId: chat.id) {
+    init(chat: Chat) {
+        if let key = Cache.chatKey(chatId: chat.id) {
             self.key = key
         } else {
             key = ""

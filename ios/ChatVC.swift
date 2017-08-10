@@ -18,11 +18,11 @@ class ChatVC: JSQMessagesViewController {
         super.viewDidLoad()
         
         // Load encryption from cache.
-        enc = Encryption(chat: chat, cache: cache())
+        enc = Encryption(chat: chat)
         
         // Set up background.
         view.backgroundColor = UIColor.white
-        title = chat.getNamesExceptFor(user: cache().user)
+        title = chat.getNamesExceptFor(user: Cache.loadUser())
         
         // Setup messages.
         collectionView!.collectionViewLayout.incomingAvatarViewSize = CGSize.zero
@@ -68,11 +68,11 @@ class ChatVC: JSQMessagesViewController {
     // JSQMessageViewController
     
     override func senderId() -> String {
-        return cache().user.stringID()
+        return Cache.loadUser().stringID()
     }
     
     override func senderDisplayName() -> String {
-        return cache().user.fullName()
+        return Cache.loadUser().fullName()
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView, messageDataForItemAt indexPath: IndexPath) -> JSQMessageData {
@@ -135,6 +135,7 @@ class ChatVC: JSQMessagesViewController {
     }
     
     override func pushNotificationReceived(payload: [String:Any]) {
+        print(payload)
         if let chatId = payload["chat_id"] as? String {
             if chatId == self.chat.id {
                 loadMessages()

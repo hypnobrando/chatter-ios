@@ -13,9 +13,7 @@ import UserNotifications
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    var cache = Cache()
     var window: UIWindow?
-    var apnToken = ""
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -30,13 +28,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
         // Load the cache if it exists.
-        //cache = Cache.loadUser()
-        //cache.clear()
-        //let key = Encryption.createKey()
-        //cache.setChatKey(chatId: "5988ac1904457f00010db700", key: key.key)
+        let user = Cache.loadUser()
+        
+        //Cache.clear()
         
         var mainView : UIViewController
-        if cache.loaded {
+        if !user.isEmpty() {
             mainView = UINavigationController()
             let home = HomeVC()
             (mainView as! UINavigationController).viewControllers = [home]
@@ -52,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        self.apnToken = token
+        Cache.cacheApnToken(token: token)
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {

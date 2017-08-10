@@ -40,13 +40,15 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         settingsButton.setTitle("Settings", for: .normal)
         settingsButton.addTarget(self, action: #selector(settingsButtonPressed), for: .touchUpInside)
         
-        // Get information from backend.
-        getChats()
-        
         // Add views.
         view.addSubview(table)
         view.addSubview(connectButton)
         view.addSubview(settingsButton)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        // Get information from backend.
+        getChats()
     }
 
     override func didReceiveMemoryWarning() {
@@ -56,7 +58,7 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     func getChats() {
         // Make request to backend to get all of the user's chats.
-        API.getUsersChats(userId: cache().user.id, completionHandler: {
+        API.getUsersChats(userId: Cache.loadUser().id, completionHandler: {
             (response, chats) -> Void in
             
             if response != URLResponse.Success {
@@ -75,7 +77,8 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     }
     
     func settingsButtonPressed(sender: UIButton!) {
-        print("SETTINGS BUTTON CLICKED")
+        let settings = SettingsVC()
+        navigationController?.pushViewController(settings, animated: true)
     }
     
     // UITableView DataSource
@@ -87,7 +90,7 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let chat = chats[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
-        cell.name.text = chat.getNamesExceptFor(user: cache().user)
+        cell.name.text = chat.getNamesExceptFor(user: Cache.loadUser())
         return cell
     }
     

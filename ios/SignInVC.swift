@@ -51,12 +51,15 @@ class SignInVC: UIViewController, UITextFieldDelegate {
         
         if firstName.text == nil || firstName.text == "" || lastName.text == nil || lastName.text == "" {
             // TODO - warn user.
+            pushAlertView(title: "Error", message: "Please enter your full name")
             return
         }
         
-        let apnToken = self.apnToken()
+        let apnToken = Cache.loadUser().apnToken
+
         if apnToken == "" {
             // TODO - warn user.
+            pushAlertView(title: "Error", message: "Please enable push notifications")
             return
         }
         
@@ -66,12 +69,12 @@ class SignInVC: UIViewController, UITextFieldDelegate {
             
             if response != URLResponse.Success {
                 // Do shit.
-                print(response)
+                self.pushAlertView(title: "Error", message: "Check your internet connection \(response), \(self.firstName.text!), \(self.lastName.text!), \(apnToken)")
                 return
             }
             
             // Cache the user info.
-            self.saveCacheToAppDelegate(cache: Cache.cacheUser(contact: contact!))
+            Cache.cacheUser(contact: contact!)
             
             // Transition to next vc.
             let nav = UINavigationController()

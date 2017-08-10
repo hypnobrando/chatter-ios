@@ -9,64 +9,56 @@
 import Foundation
 
 class Cache {
-    var loaded = false
-    var user = Contact()
-    private var defaults = UserDefaults.standard
+    static var defaults = UserDefaults.standard
     
-    init () {}
-    
-    init(contact: Contact) {
-        user = contact
-        loaded = true
-    }
-    
-    static func loadUser() -> Cache {
-        let cache = Cache()
+    static func loadUser() -> Contact {
+        let user = Contact()
         
-        if let firstName = cache.defaults.string(forKey: "first_name") {
-            cache.user.firstName = firstName
+        if let firstName = defaults.string(forKey: "first_name") {
+            user.firstName = firstName
         }
-        if let lastName = cache.defaults.string(forKey: "last_name") {
-            cache.user.lastName = lastName
+        if let lastName = defaults.string(forKey: "last_name") {
+            user.lastName = lastName
         }
-        if let id = cache.defaults.string(forKey: "id") {
-            cache.user.id = id
-            cache.loaded = true
+        if let id = defaults.string(forKey: "id") {
+            user.id = id
         }
-        if let apnToken = cache.defaults.string(forKey: "apn_token") {
-            cache.user.apnToken = apnToken
+        if let apnToken = defaults.string(forKey: "apn_token") {
+            user.apnToken = apnToken
         }
         
-        return cache
+        return user
     }
     
-    static func cacheUser(contact: Contact) -> Cache {
-        let cache = Cache(contact: contact)
-        cache.defaults.setValue(contact.firstName, forKey: "first_name")
-        cache.defaults.setValue(contact.lastName, forKey: "last_name")
-        cache.defaults.setValue(contact.id, forKey: "id")
-        cache.defaults.setValue(contact.apnToken, forKey: "apn_token")
-        cache.defaults.synchronize()
-        
-        return cache
+    static func cacheUser(contact: Contact) {
+        defaults.set(contact.firstName, forKey: "first_name")
+        defaults.set(contact.lastName, forKey: "last_name")
+        defaults.set(contact.id, forKey: "id")
+        if contact.apnToken != "" {
+            defaults.set(contact.apnToken, forKey: "apn_token")
+        }
+        defaults.synchronize()
     }
     
-    func clear() {
+    static func cacheApnToken(token: String) {
+        if token != "" {
+            defaults.set(token, forKey: "apn_token")
+        }
+    }
+    
+    static func clear() {
         defaults.removeObject(forKey: "first_name")
         defaults.removeObject(forKey: "last_name")
         defaults.removeObject(forKey: "id")
-        defaults.removeObject(forKey: "apn_token")
-
-        loaded = false
-        user = Contact()
+        defaults.synchronize()
     }
     
-    func chatKey(chatId: String) -> String? {
+    static func chatKey(chatId: String) -> String? {
         return defaults.string(forKey: "Key: \(chatId)")
     }
     
-    func setChatKey(chatId: String, key: String) {
-        defaults.setValue(key, forKey: "Key: \(chatId)")
+    static func setChatKey(chatId: String, key: String) {
+        defaults.set(key, forKey: "Key: \(chatId)")
         defaults.synchronize()
     }
 }
