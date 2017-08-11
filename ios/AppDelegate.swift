@@ -35,16 +35,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        Cache.cacheApnToken(token: token)
+        if token != "" {
+            Cache.cacheApnToken(token: token)
+        }
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        if let nav = self.window!.rootViewController as? UINavigationController {
-            if let payload = userInfo as? [String : Any] {
-                nav.visibleViewController?.pushNotificationReceived(payload: payload)
-            }
+        let top = topViewController()
+        
+        if let payload = userInfo as? [String : Any] {
+            top?.pushNotificationReceived(payload: payload)
         }
         completionHandler(.newData)
+    }
+    
+    func topViewController(base: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
+        if let nav = base as? UINavigationController {
+            return topViewController(base: nav.visibleViewController)
+        }
+        if let tab = base as? UITabBarController {
+            if let selected = tab.selectedViewController {
+                return topViewController(base: selected)
+            }
+        }
+        if let presented = base?.presentedViewController {
+            return topViewController(base: presented)
+        }
+        return base
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
