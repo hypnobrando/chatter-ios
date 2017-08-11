@@ -22,7 +22,7 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         
         // Set up background.
         navigationController?.navigationBar.topItem?.title = "Home"
-        view.backgroundColor = UIColor.lightGray
+        view.backgroundColor = UIColor.white
         
         // Setup views.
         table = UITableView(frame: CGRect(x: view.frame.origin.x, y: view.frame.origin.y, width: view.frame.width, height: view.frame.height - BOTTOM_MARGIN))
@@ -36,7 +36,7 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         connectButton.addTarget(self, action: #selector(connectButtonPressed), for: .touchUpInside)
         
         settingsButton = UIButton(frame: CGRect(origin: CGPoint(x: view.frame.width / 2.0, y: connectButton.frame.origin.y), size: connectButton.frame.size))
-        settingsButton.backgroundColor = view.backgroundColor
+        settingsButton.backgroundColor = UIColor.lightGray
         settingsButton.setTitle("Settings", for: .normal)
         settingsButton.addTarget(self, action: #selector(settingsButtonPressed), for: .touchUpInside)
         

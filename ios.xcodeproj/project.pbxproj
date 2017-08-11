@@ -162,8 +162,8 @@
 			children = (
 				A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */,
 				A880EB3A1F3C193300340B2C /* Env.swift */,
-				A8AFBC9C1F324E4E007A5FEE /* VC */,
 				A82974BC1F3286BD00DC7B7A /* Extensions */,
+				A8AFBC9C1F324E4E007A5FEE /* ViewControllers */,
 				A82974C31F34090B00DC7B7A /* API */,
 				A82974B91F32835500DC7B7A /* Cache */,
 				A880EB421F3D673900340B2C /* Models */,
@@ -177,7 +177,7 @@
 			path = ios;
 			sourceTree = "<group>";
 		};
-		A8AFBC9C1F324E4E007A5FEE /* VC */ = {
+		A8AFBC9C1F324E4E007A5FEE /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
 				A8AFBC891F324C9A007A5FEE /* HomeVC.swift */,
@@ -187,7 +187,7 @@
 				A880EB381F3C0DE000340B2C /* SettingsVC.swift */,
 				A880EB401F3D58E900340B2C /* PinVC.swift */,
 			);
-			name = VC;
+			name = ViewControllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
