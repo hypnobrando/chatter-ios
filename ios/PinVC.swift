@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PinVC: UIViewController, UITextFieldDelegate {
+class PinVC: ChatterVC, UITextFieldDelegate {
 
     let LEFT_MARGIN : CGFloat = 45.0
     let TOP_MARGIN : CGFloat = 140.0

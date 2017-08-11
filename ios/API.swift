@@ -137,9 +137,29 @@ class API {
             if data["error"] != nil {
                 return completionHandler(URLResponse.Error, nil)
             }
-            print(data)
+            
             let chat = Chat.deserialize(json: data["chat"] as! [String : Any])
             completionHandler(URLResponse.Success, chat)
+        })
+    }
+    
+    class func deleteUser(userId: String, completionHandler: @escaping (URLResponse) -> Void) {
+        API.performRequest(requestType: "DELETE", urlPath: "users/\(userId)", json: nil, token: nil, completionHandler: {
+            (response, data) in
+            if let _ = data as? URLResponse {
+                return completionHandler(URLResponse.ServerDown)
+            }
+            
+            if response == nil {
+                return completionHandler(URLResponse.NotConnected)
+            }
+            
+            let data = data as! [String : Any]
+            if data["error"] != nil {
+                return completionHandler(URLResponse.Error)
+            }
+            
+            completionHandler(URLResponse.Success)
         })
     }
     

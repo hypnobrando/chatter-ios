@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SignInVC: UIViewController, UITextFieldDelegate {
+class SignInVC: ChatterVC, UITextFieldDelegate {
     
     let TOP_MARGIN = CGFloat(100.0)
     let LEFT_MARGIN = CGFloat(45.0)
@@ -34,7 +34,7 @@ class SignInVC: UIViewController, UITextFieldDelegate {
         firstName.delegate = self
         lastName.delegate = self
         submit = UIButton(frame: CGRect(x: LEFT_MARGIN, y: lastName.frame.origin.y + lastName.frame.height + LABEL_SPACE, width: lastName.frame.width, height: lastName.frame.height))
-        submit.backgroundColor = UIColor.blue
+        submit.backgroundColor = BlueColor
         submit.setTitle("Submit", for: .normal)
         submit.addTarget(self, action: #selector(submitButtonTapped), for: .touchUpInside)
         

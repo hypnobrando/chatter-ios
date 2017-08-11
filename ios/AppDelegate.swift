@@ -27,34 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         self.window = UIWindow(frame: UIScreen.main.bounds)
         
-        // Load the cache if it exists.
-        let user = Cache.loadUser()
-        
         //Cache.clear()
         //Cache.setPin(pin: "3131")
-        
-        var mainView : UIViewController
-        if !user.isEmpty() {
-            let pin = PinVC()
-            pin.completionHandler = {
-                (_: String) -> Void in
-                let nav = UINavigationController()
-                let home = HomeVC()
-                nav.viewControllers = [home]
-                pin.present(nav, animated: true, completion: nil)
-            }
-            
-            mainView = pin
-            
-            //mainView = UINavigationController()
-            //let home = HomeVC()
-            //(mainView as! UINavigationController).viewControllers = [home]
-        } else {
-            mainView = SignInVC()
-        }
-        
-        self.window!.rootViewController = mainView
-        self.window?.makeKeyAndVisible()
         
         return true
     }
@@ -89,6 +63,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+        // Load the cache if it exists.
+        let user = Cache.loadUser()
+        
+        var mainView : UIViewController
+        if !user.isEmpty() {
+            let pin = PinVC()
+            pin.completionHandler = {
+                (_: String) -> Void in
+                let nav = UINavigationController()
+                let home = HomeVC()
+                nav.viewControllers = [home]
+                pin.present(nav, animated: true, completion: nil)
+            }
+            
+            mainView = pin
+            
+            //mainView = UINavigationController()
+            //let home = HomeVC()
+            //(mainView as! UINavigationController).viewControllers = [home]
+        } else {
+            mainView = SignInVC()
+        }
+        
+        self.window!.rootViewController = mainView
+        self.window?.makeKeyAndVisible()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

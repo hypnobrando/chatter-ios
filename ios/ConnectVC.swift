@@ -9,7 +9,7 @@
 import UIKit
 import BluetoothKit
 
-class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, BKPeripheralDelegate, BKCentralDelegate, BKAvailabilityObserver, BKRemotePeerDelegate {
+class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeripheralDelegate, BKCentralDelegate, BKAvailabilityObserver, BKRemotePeerDelegate {
     
     let SERVICE_UUID = UUID(uuidString: "2F6D474A-C5C5-4E39-837D-00C98A87E458")!
     let CHARACTERISTIC_UUID = UUID(uuidString: "EBB708B1-154D-4F9A-AF0A-B4CF1B05D5DF")!
@@ -41,7 +41,7 @@ class ConnectVC: UIViewController, UITableViewDataSource, UITableViewDelegate, B
         table.dataSource = self
         table.delegate = self
         button = Button(frame: CGRect(x: view.frame.origin.x, y: table.frame.maxY, width: view.frame.width, height: BUTTON_HEIGHT))
-        button.backgroundColor = UIColor.blue
+        button.backgroundColor = BlueColor
         button.setTitle("Search", for: .normal)
         button.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
         button.currentState = ButtonStates.Idle.hashValue

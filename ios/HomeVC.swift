@@ -8,7 +8,7 @@
 
 import UIKit
 
-class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class HomeVC: ChatterVC, UITableViewDataSource, UITableViewDelegate {
     
     let BOTTOM_MARGIN : CGFloat = 50.0
     
@@ -22,7 +22,6 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         
         // Set up background.
         navigationController?.navigationBar.topItem?.title = "Home"
-        view.backgroundColor = UIColor.white
         
         // Setup views.
         table = UITableView(frame: CGRect(x: view.frame.origin.x, y: view.frame.origin.y, width: view.frame.width, height: view.frame.height - BOTTOM_MARGIN))
@@ -31,7 +30,7 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         table.delegate = self
         
         connectButton = UIButton(frame: CGRect(x: view.frame.origin.x, y: view.frame.maxY - BOTTOM_MARGIN, width: view.frame.width / 2.0, height: BOTTOM_MARGIN))
-        connectButton.backgroundColor = UIColor.blue
+        connectButton.backgroundColor = BlueColor
         connectButton.setTitle("Connect", for: .normal)
         connectButton.addTarget(self, action: #selector(connectButtonPressed), for: .touchUpInside)
         
@@ -57,9 +56,13 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     }
 
     func getChats() {
+        pushSpinner(message: "", frame: table.frame)
+        
         // Make request to backend to get all of the user's chats.
         API.getUsersChats(userId: Cache.loadUser().id, completionHandler: {
             (response, chats) -> Void in
+            
+            self.removeSpinner()
             
             if response != URLResponse.Success {
                 print(response)

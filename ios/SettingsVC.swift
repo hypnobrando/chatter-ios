@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SettingsVC: UIViewController {
+class SettingsVC: ChatterVC {
     
     let LEFT_MARGIN : CGFloat = 45.0
     let TOP_MARGIN : CGFloat = 100.0
@@ -23,7 +23,7 @@ class SettingsVC: UIViewController {
         view.backgroundColor = UIColor.white
         
         deleteAccountButton = UIButton(frame: CGRect(x: LEFT_MARGIN, y: TOP_MARGIN, width: view.frame.width - 2 * LEFT_MARGIN, height: BUTTON_HEIGHT))
-        deleteAccountButton.backgroundColor = UIColor.blue
+        deleteAccountButton.backgroundColor = BlueColor
         deleteAccountButton.setTitle("Delete Account", for: .normal)
         deleteAccountButton.addTarget(self, action: #selector(deleteAccountButtonPressed), for: .touchUpInside)
         
@@ -36,9 +36,20 @@ class SettingsVC: UIViewController {
     }
     
     func deleteAccountButtonPressed(sender: UIButton!) {
-        Cache.clear()
-        let signInVC = SignInVC()
-        present(signInVC, animated: true, completion: nil)
+        pushSpinner(message: "", frame: view.frame)
+        API.deleteUser(userId: Cache.loadUser().id, completionHandler: {
+            response -> Void in
+            self.removeSpinner()
+            
+            if response != URLResponse.Success {
+                print(response)
+                return
+            }
+            
+            Cache.clear()
+            let signInVC = SignInVC()
+            self.present(signInVC, animated: true, completion: nil)
+        })
     }
 
     /*
