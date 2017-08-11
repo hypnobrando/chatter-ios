@@ -21,6 +21,7 @@
 		A880EB391F3C0DE000340B2C /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A880EB381F3C0DE000340B2C /* SettingsVC.swift */; };
 		A880EB3B1F3C193300340B2C /* Env.swift in Sources */ = {isa = PBXBuildFile; fileRef = A880EB3A1F3C193300340B2C /* Env.swift */; };
 		A880EB3F1F3C412800340B2C /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A880EB3E1F3C412800340B2C /* Spinner.swift */; };
+		A880EB411F3D58E900340B2C /* PinVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A880EB401F3D58E900340B2C /* PinVC.swift */; };
 		A89D29081F3B8DE7003559D6 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89D29071F3B8DE7003559D6 /* Button.swift */; };
 		A8AFBC881F324C9A007A5FEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */; };
 		A8AFBC8A1F324C9A007A5FEE /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8AFBC891F324C9A007A5FEE /* HomeVC.swift */; };
@@ -48,6 +49,7 @@
 		A880EB381F3C0DE000340B2C /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		A880EB3A1F3C193300340B2C /* Env.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Env.swift; sourceTree = "<group>"; };
 		A880EB3E1F3C412800340B2C /* Spinner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
+		A880EB401F3D58E900340B2C /* PinVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinVC.swift; sourceTree = "<group>"; };
 		A89D29071F3B8DE7003559D6 /* Button.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		A8AFBC841F324C9A007A5FEE /* ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 		A82974BC1F3286BD00DC7B7A /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				A82D16851F3255320088B59D /* ContactCell.swift */,
 				A82974BD1F3286D200DC7B7A /* +UIViewController.swift */,
 				A82974BF1F32AE7B00DC7B7A /* TextField.swift */,
 				A89D29071F3B8DE7003559D6 /* Button.swift */,
@@ -117,22 +120,6 @@
 			name = API;
 			sourceTree = "<group>";
 		};
-		A82974C61F346D9500DC7B7A /* Chat */ = {
-			isa = PBXGroup;
-			children = (
-				A82974C91F346F3800DC7B7A /* Chat.swift */,
-			);
-			name = Chat;
-			sourceTree = "<group>";
-		};
-		A82974CB1F346FF000DC7B7A /* Message */ = {
-			isa = PBXGroup;
-			children = (
-				A82974CC1F34700600DC7B7A /* Message.swift */,
-			);
-			name = Message;
-			sourceTree = "<group>";
-		};
 		A82974CF1F353BAE00DC7B7A /* Encryption */ = {
 			isa = PBXGroup;
 			children = (
@@ -141,12 +128,14 @@
 			name = Encryption;
 			sourceTree = "<group>";
 		};
-		A82D16841F3255130088B59D /* Cells */ = {
+		A880EB421F3D673900340B2C /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				A82D16851F3255320088B59D /* ContactCell.swift */,
+				A8AFBCA11F325148007A5FEE /* Contact.swift */,
+				A82974C91F346F3800DC7B7A /* Chat.swift */,
+				A82974CC1F34700600DC7B7A /* Message.swift */,
 			);
-			name = Cells;
+			name = Models;
 			sourceTree = "<group>";
 		};
 		A8AFBC7B1F324C9A007A5FEE = {
@@ -171,17 +160,14 @@
 		A8AFBC861F324C9A007A5FEE /* Lib */ = {
 			isa = PBXGroup;
 			children = (
-				A880EB3A1F3C193300340B2C /* Env.swift */,
-				A82974CF1F353BAE00DC7B7A /* Encryption */,
-				A82974CB1F346FF000DC7B7A /* Message */,
-				A82974C61F346D9500DC7B7A /* Chat */,
-				A82974C31F34090B00DC7B7A /* API */,
-				A82974BC1F3286BD00DC7B7A /* Extensions */,
-				A82974B91F32835500DC7B7A /* Cache */,
-				A8AFBCA01F32513A007A5FEE /* Contact */,
-				A82D16841F3255130088B59D /* Cells */,
-				A8AFBC9C1F324E4E007A5FEE /* VC */,
 				A8AFBC871F324C9A007A5FEE /* AppDelegate.swift */,
+				A880EB3A1F3C193300340B2C /* Env.swift */,
+				A8AFBC9C1F324E4E007A5FEE /* VC */,
+				A82974BC1F3286BD00DC7B7A /* Extensions */,
+				A82974C31F34090B00DC7B7A /* API */,
+				A82974B91F32835500DC7B7A /* Cache */,
+				A880EB421F3D673900340B2C /* Models */,
+				A82974CF1F353BAE00DC7B7A /* Encryption */,
 				A8AFBC911F324C9A007A5FEE /* Assets.xcassets */,
 				A8AFBC931F324C9A007A5FEE /* LaunchScreen.storyboard */,
 				A8AFBC961F324C9A007A5FEE /* Info.plist */,
@@ -199,16 +185,9 @@
 				A82974B71F3282DF00DC7B7A /* SignInVC.swift */,
 				A82974C11F33ACB500DC7B7A /* ConnectVC.swift */,
 				A880EB381F3C0DE000340B2C /* SettingsVC.swift */,
+				A880EB401F3D58E900340B2C /* PinVC.swift */,
 			);
 			name = VC;
-			sourceTree = "<group>";
-		};
-		A8AFBCA01F32513A007A5FEE /* Contact */ = {
-			isa = PBXGroup;
-			children = (
-				A8AFBCA11F325148007A5FEE /* Contact.swift */,
-			);
-			name = Contact;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -348,6 +327,7 @@
 				A880EB3B1F3C193300340B2C /* Env.swift in Sources */,
 				A82974BB1F32837300DC7B7A /* Cache.swift in Sources */,
 				A89D29081F3B8DE7003559D6 /* Button.swift in Sources */,
+				A880EB411F3D58E900340B2C /* PinVC.swift in Sources */,
 				A82974D11F353BF200DC7B7A /* Encryption.swift in Sources */,
 				A880EB3F1F3C412800340B2C /* Spinner.swift in Sources */,
 				A8AFBC9E1F324E96007A5FEE /* ChatVC.swift in Sources */,

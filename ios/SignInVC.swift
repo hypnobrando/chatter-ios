@@ -23,6 +23,7 @@ class SignInVC: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        Cache.removePin()
         
         // Setup main view.
         view.backgroundColor = UIColor.white
@@ -77,10 +78,17 @@ class SignInVC: UIViewController, UITextFieldDelegate {
             Cache.cacheUser(contact: contact!)
             
             // Transition to next vc.
-            let nav = UINavigationController()
-            let home = HomeVC()
-            nav.viewControllers = [home]
-            self.present(nav, animated: true, completion: nil)
+            let pin = PinVC()
+            pin.completionHandler = {
+                (newPin: String) -> Void in
+                let nav = UINavigationController()
+                let home = HomeVC()
+                nav.viewControllers = [home]
+                Cache.setPin(pin: newPin)
+                pin.present(nav, animated: true, completion: nil)
+            }
+
+            self.present(pin, animated: true, completion: nil)
         })
     }
     

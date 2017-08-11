@@ -61,4 +61,18 @@ class Cache {
         defaults.set(key, forKey: "Key: \(chatId)")
         defaults.synchronize()
     }
+    
+    static func getPin() -> String? {
+        return defaults.string(forKey: "pin")
+    }
+    
+    static func setPin(pin: String) {
+        defaults.set(pin, forKey: "pin")
+        defaults.synchronize()
+    }
+    
+    static func removePin(){
+        defaults.removeObject(forKey: "pin")
+        defaults.synchronize()
+    }
 }

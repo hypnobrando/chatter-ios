@@ -31,12 +31,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let user = Cache.loadUser()
         
         //Cache.clear()
+        //Cache.setPin(pin: "3131")
         
         var mainView : UIViewController
         if !user.isEmpty() {
-            mainView = UINavigationController()
-            let home = HomeVC()
-            (mainView as! UINavigationController).viewControllers = [home]
+            let pin = PinVC()
+            pin.completionHandler = {
+                (_: String) -> Void in
+                let nav = UINavigationController()
+                let home = HomeVC()
+                nav.viewControllers = [home]
+                pin.present(nav, animated: true, completion: nil)
+            }
+            
+            mainView = pin
+            
+            //mainView = UINavigationController()
+            //let home = HomeVC()
+            //(mainView as! UINavigationController).viewControllers = [home]
         } else {
             mainView = SignInVC()
         }
