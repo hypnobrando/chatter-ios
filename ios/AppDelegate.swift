@@ -42,6 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var mainView : UIViewController
         if !user.isEmpty() {
             let pin = PinVC()
+            pin.placeholder = ""
             pin.completionHandler = {
                 (_: String) -> Void in
                 let nav = UINavigationController()

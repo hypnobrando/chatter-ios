@@ -11,11 +11,12 @@ import UIKit
 class PinVC: ChatterVC, UITextFieldDelegate {
 
     let LEFT_MARGIN : CGFloat = 45.0
-    let TOP_MARGIN : CGFloat = 140.0
+    let TOP_MARGIN : CGFloat = 160.0
     let TEXTFIELD_HEIGHT : CGFloat = 60.0
 
     var textField = UITextField()
     var completionHandler : ((String) -> Void?)? = nil
+    var placeholder = "enter pin..."
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,10 +36,13 @@ class PinVC: ChatterVC, UITextFieldDelegate {
             NSForegroundColorAttributeName: UIColor.white,
             NSFontAttributeName : UIFont.systemFont(ofSize: 16.0) // Note the !
         ]
-        textField.attributedPlaceholder = NSAttributedString(string: "enter pin...", attributes:placeholderAttributes)
+        textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes:placeholderAttributes)
+        let disablerView = UIView(frame: textField.frame)
+        disablerView.backgroundColor = UIColor.clear
         
         // Add subviews.
         view.addSubview(textField)
+        view.addSubview(disablerView)
         
         // Open keyboard.
         textField.becomeFirstResponder()
