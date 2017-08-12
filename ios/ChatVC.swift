@@ -49,7 +49,6 @@ class ChatVC: JSQMessagesViewController {
             (response, chat) -> Void in
             
             if response != URLResponse.Success {
-                print(response)
                 return
             }
                 
@@ -135,7 +134,7 @@ class ChatVC: JSQMessagesViewController {
             self.sending = false
             
             if response != URLResponse.Success {
-                print(response)
+                self.pushAlertView(title: "Error", message: "Check your internet connection.")
                 self.loadMessages()
                 return
             }
@@ -143,7 +142,6 @@ class ChatVC: JSQMessagesViewController {
     }
     
     override func pushNotificationReceived(payload: [String:Any]) {
-        print(payload)
         if let chatId = payload["chat_id"] as? String {
             if chatId == self.chat.id {
                 loadMessages()

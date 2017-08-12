@@ -21,6 +21,13 @@ extension UIViewController {
         self.present(alertView, animated: true, completion: nil)
     }
     
+    func pushAlertActionView(title: String, message: String, handler: @escaping ((UIAlertAction) -> Void)) {
+        let alertView = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertView.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
+        alertView.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: handler))
+        self.present(alertView, animated: true, completion: nil)
+    }
+    
     func pushSpinner(message: String, frame: CGRect) {
         let spinnerView = Spinner(frame: frame)
         spinnerView.backgroundColor = UIColor.clear

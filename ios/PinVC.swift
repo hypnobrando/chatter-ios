@@ -13,7 +13,7 @@ class PinVC: ChatterVC, UITextFieldDelegate {
     let LEFT_MARGIN : CGFloat = 45.0
     let TOP_MARGIN : CGFloat = 140.0
     let TEXTFIELD_HEIGHT : CGFloat = 60.0
-    
+
     var textField = UITextField()
     var completionHandler : ((String) -> Void?)? = nil
     
@@ -21,14 +21,21 @@ class PinVC: ChatterVC, UITextFieldDelegate {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        view.backgroundColor = UIColor.white
+        view.backgroundColor = BlueColor
         textField = UITextField(frame: CGRect(x: LEFT_MARGIN, y: TOP_MARGIN, width: view.frame.width - 2.0 * LEFT_MARGIN, height: TEXTFIELD_HEIGHT))
         textField.keyboardType = .numberPad
         textField.textAlignment = .center
         textField.font = UIFont.boldSystemFont(ofSize: 56.0)
         textField.isSecureTextEntry = true
         textField.tintColor = UIColor.clear
+        textField.textColor = UIColor.white
+        textField.keyboardAppearance = .alert
         textField.delegate = self
+        let placeholderAttributes = [
+            NSForegroundColorAttributeName: UIColor.white,
+            NSFontAttributeName : UIFont.systemFont(ofSize: 16.0) // Note the !
+        ]
+        textField.attributedPlaceholder = NSAttributedString(string: "enter pin...", attributes:placeholderAttributes)
         
         // Add subviews.
         view.addSubview(textField)

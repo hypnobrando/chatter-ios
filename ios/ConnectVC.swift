@@ -140,7 +140,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
             (response, chat) in
             
             if response != URLResponse.Success {
-                print(response)
+                self.pushAlertView(title: "Error", message: "Check your internet connection.")
                 return
             }
             
@@ -327,6 +327,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         } catch let error {
             print(error)
         }
+
         navigationController!.popViewController(animated: true)
     }
 }

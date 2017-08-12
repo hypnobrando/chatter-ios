@@ -163,6 +163,30 @@ class API {
         })
     }
     
+    class func patchUser(userId: String, firstName: String, lastName: String, completionHandler: @escaping (URLResponse, Contact?) -> Void) {
+        let json = ["first_name": firstName, "last_name": lastName]
+        API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)", json: json, token: nil, completionHandler: {
+            (response, data) in
+            
+            if let _ = data as? URLResponse {
+                return completionHandler(URLResponse.ServerDown, nil)
+            }
+            
+            if response == nil {
+                return completionHandler(URLResponse.NotConnected, nil)
+            }
+            
+            let data = data as! [String : Any]
+            if data["error"] != nil {
+                return completionHandler(URLResponse.Error, nil)
+            }
+            
+            let userJson = data["user"] as! [String : String]
+            let contact = Contact.deserialize(json: userJson)
+            completionHandler(URLResponse.Success, contact)
+        })
+    }
+    
     // HELPERS
     
     class func loadMessageFromData(data: [String : Any]) -> [String : Any] {

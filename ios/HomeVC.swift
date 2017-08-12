@@ -21,7 +21,7 @@ class HomeVC: ChatterVC, UITableViewDataSource, UITableViewDelegate {
         super.viewDidLoad()
         
         // Set up background.
-        navigationController?.navigationBar.topItem?.title = "Home"
+        navigationController?.navigationBar.topItem?.title = "Chatter"
         
         // Setup views.
         table = UITableView(frame: CGRect(x: view.frame.origin.x, y: view.frame.origin.y, width: view.frame.width, height: view.frame.height - BOTTOM_MARGIN))
@@ -65,7 +65,7 @@ class HomeVC: ChatterVC, UITableViewDataSource, UITableViewDelegate {
             self.removeSpinner()
             
             if response != URLResponse.Success {
-                print(response)
+                self.pushAlertView(title: "Error", message: "Check your internet connection.")
                 return
             }
 
