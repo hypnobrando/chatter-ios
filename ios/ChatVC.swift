@@ -31,6 +31,7 @@ class ChatVC: JSQMessagesViewController {
         inputToolbar.contentView?.leftBarButtonItem = nil
         
         // Load messages
+        pushSpinner(message: "", frame: view.frame)
         loadMessages()
     }
     
@@ -47,7 +48,7 @@ class ChatVC: JSQMessagesViewController {
     func loadMessages() {
         API.getChatMessages(chatId: self.chat.id, completionHandler: {
             (response, chat) -> Void in
-            
+            self.removeSpinner()
             if response != URLResponse.Success {
                 return
             }
