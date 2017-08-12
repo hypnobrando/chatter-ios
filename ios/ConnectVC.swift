@@ -30,10 +30,6 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         // Do any additional setup after loading the view.
         
         // Setup the view.
-        self.navigationItem.hidesBackButton = true
-        let newBackButton = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(back))
-        self.navigationItem.leftBarButtonItem = newBackButton
-        
         view.backgroundColor = UIColor.white
         let navBarHeight = navigationController!.navigationBar.frame.height + navigationController!.navigationBar.frame.origin.y
         table = UITableView(frame: CGRect(x: view.frame.origin.x, y: view.frame.origin.y + navBarHeight, width: view.frame.width, height: view.frame.height - BUTTON_HEIGHT - navBarHeight))
@@ -57,10 +53,6 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         // Add subviews
         view.addSubview(button)
         view.addSubview(table)
-    }
-    
-    func back(sender: UIBarButtonItem) {
-        goToMainMenu()
     }
 
     override func didReceiveMemoryWarning() {
@@ -329,6 +321,15 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         }
 
         navigationController!.popViewController(animated: true)
+    }
+    
+    override func willMove(toParentViewController parent: UIViewController?) {
+        do {
+            try central.stop()
+            try peripheral.stop()
+        } catch let error {
+            print(error)
+        }
     }
 }
 
