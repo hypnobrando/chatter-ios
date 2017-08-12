@@ -70,6 +70,7 @@ class SettingsVC: ChatterVC, UITextFieldDelegate {
             }
             
             Cache.cacheUser(contact: user!)
+            self.navigationController?.popViewController(animated: true)
         })
     }
     
