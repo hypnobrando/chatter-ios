@@ -15,7 +15,8 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     let CHARACTERISTIC_UUID = UUID(uuidString: "EBB708B1-154D-4F9A-AF0A-B4CF1B05D5DF")!
     var BT_LOCAL_NAME = "Chatter Peripheral"
     let BUTTON_HEIGHT : CGFloat = 50.0
-    var key = ""
+    
+    var state = ButtonState.CentralIdle
     
     var table = UITableView()
     var button = Button()
@@ -23,6 +24,8 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     var peripheral = BKPeripheral()
     var central = BKCentral()
     var remoteCentral : BKRemoteCentral? = nil
+    
+    var connectedPeripherals = [(BKRemotePeer, String)]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,13 +37,13 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         let navBarHeight = navigationController!.navigationBar.frame.height + navigationController!.navigationBar.frame.origin.y
         table = UITableView(frame: CGRect(x: view.frame.origin.x, y: view.frame.origin.y + navBarHeight, width: view.frame.width, height: view.frame.height - BUTTON_HEIGHT - navBarHeight))
         table.register(ContactCell.self, forCellReuseIdentifier: "ContactCell")
+        table.allowsMultipleSelection = true
         table.dataSource = self
         table.delegate = self
         button = Button(frame: CGRect(x: view.frame.origin.x, y: table.frame.maxY, width: view.frame.width, height: BUTTON_HEIGHT))
         button.backgroundColor = BlueColor
         button.setTitle("Search", for: .normal)
         button.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
-        button.currentState = ButtonStates.Idle.hashValue
         
         // Setup bluetooth.
         BT_LOCAL_NAME = Cache.loadUser().fullName()
@@ -70,6 +73,11 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         let discovery = discoveries[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
         cell.name.text = discovery.localName
+        
+        let selectedIndexPaths = tableView.indexPathsForSelectedRows
+        let rowIsSelected = selectedIndexPaths != nil && selectedIndexPaths!.contains(indexPath)
+        cell.accessoryType = rowIsSelected ? .checkmark : .none
+        
         return cell
     }
     
@@ -81,19 +89,22 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     
     // 1 - Central
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let discovery = discoveries[indexPath.row]
-        pushSpinner(message: "", frame: table.frame)
-        central.connect(remotePeripheral: discovery.remotePeripheral, completionHandler: {
-            (remotePeripheral, error) in
-            if error != nil {
-                // Handle error.
-                print(error)
-                return
-            }
-
-            // If no error, you're ready to receive data!
-            remotePeripheral.delegate = self
-        })
+        let cell = tableView.cellForRow(at: indexPath)!
+        cell.accessoryType = .checkmark
+        button.setTitle("Connect", for: .normal)
+        button.backgroundColor = UIColor.red
+        state = .CentralReadyToConnect
+    }
+    
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath)!
+        cell.accessoryType = .none
+        
+        if tableView.indexPathsForSelectedRows == nil || tableView.indexPathsForSelectedRows!.count == 0 {
+            button.setTitle("Stop", for: .normal)
+            button.backgroundColor = BlueColor
+            state = .CentralSearching
+        }
     }
     
     // Bluetooth Remote Peripheral Delegate
@@ -107,15 +118,15 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         switch type {
         
         // 4a - Central
-        case "user_id_and_key":
+        case "user_id":
             let remoteUserId = components[1]
-            let key = components[2]
-            handleUserIdAndKey(remoteUserId: remoteUserId, key: key, remotePeer: remotePeer)
+            handleUserId(remoteUserId: remoteUserId, remotePeer: remotePeer)
             
         // 5a - Peripheral
-        case "chat_id":
+        case "chat_id_and_key":
             let chatId = components[1]
-            handleChatId(chatId: chatId)
+            let key = components[2]
+            handleChatIdAndKey(chatId: chatId, key: key)
             
         case "disconnect":
             table.deselectRow(at: table.indexPathForSelectedRow!, animated: true)
@@ -126,9 +137,22 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     }
     
     // 4b - Central
-    func handleUserIdAndKey(remoteUserId: String, key: String, remotePeer: BKRemotePeer) {
+    func handleUserId(remoteUserId: String, remotePeer: BKRemotePeer) {
+        connectedPeripherals.append((remotePeer, remoteUserId))
+        
+        if connectedPeripherals.count < table.indexPathsForSelectedRows!.count {
+            print("Waiting for more...")
+            return
+        }
+        
         // Create new chat.
-        API.createChat(userIds: [remoteUserId, Cache.loadUser().id], completionHandler: {
+        var userIds = connectedPeripherals.map({
+            (remotePeer, userId) -> String in
+            return userId
+        })
+        userIds.append(Cache.loadUser().id)
+        
+        API.createChat(userIds: userIds, completionHandler: {
             (response, chat) in
             
             if response != URLResponse.Success {
@@ -136,31 +160,34 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
                 return
             }
             
-            let dataString = "chat_id \(chat!.id)"
+            let key = Encryption.createKey().key
+            let dataString = "chat_id_and_key \(chat!.id) \(key)"
             
             // Send chat id to peripheral.
-            self.central.sendData(dataString.data(using: .utf8)!, toRemotePeer: remotePeer, completionHandler: {
-                (data, peer, error) in
-                
-                if error != nil {
-                    print(error)
-                    return
-                }
-                
-                // Cache chat id and key.
-                Cache.setChatKey(chatId: chat!.id, key: key)
-                
-                // Go back to main menu.
-                self.removeSpinner()
-                self.goToMainMenu()
-            })
+            for (peer, _) in self.connectedPeripherals {
+                self.central.sendData(dataString.data(using: .utf8)!, toRemotePeer: peer, completionHandler: {
+                    (data, peer, error) in
+                    
+                    if error != nil {
+                        print(error)
+                        return
+                    }
+                })
+            }
+            
+            // Cache chat id and key.
+            Cache.setChatKey(chatId: chat!.id, key: key)
+            
+            // Go back to main menu.
+            self.removeSpinner()
+            self.goToMainMenu()
         })
     }
     
     // 5b - Peripheral
-    func handleChatId(chatId: String) {
+    func handleChatIdAndKey(chatId: String, key: String) {
         // Cache chat id.
-        Cache.setChatKey(chatId: chatId, key: self.key)
+        Cache.setChatKey(chatId: chatId, key: key)
         
         removeSpinner()
         
@@ -187,10 +214,9 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         let name = connectedDiscovery!.localName!
         
         // Ask user if they want to send data.
-        pushSpinner(message: "", frame: table.frame)
         button.backgroundColor = UIColor.red
         button.setTitle("Connect to \(name)?", for: .normal)
-        button.currentState = ButtonStates.ReadyToConnect.hashValue
+        state = .PeripheralAskingToConnect
         self.remoteCentral = remoteCentral
     }
     
@@ -246,12 +272,12 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     
     func buttonClicked(sender: UIButton!) {
         
-        switch button.currentState {
-        case ButtonStates.Idle.hashValue:
+        switch state {
+        case ButtonState.CentralIdle:
             
             // User wants to start searching so lets do it baby.
             button.setTitle("Stop", for: .normal)
-            button.currentState = ButtonStates.Searching.hashValue
+            state = .CentralSearching
             central.scanContinuouslyWithChangeHandler({
                 (changes, discoveries) in
                 // Handle changes to "availabile" discoveries, [BKDiscoveriesChange].
@@ -275,28 +301,36 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
                 // This is where you'd ie. start/stop an activity indicator.
                 print(newState)
                 
-            }, duration: 3, inBetweenDelay: 3, errorHandler: { error in
+            }, duration: 1, inBetweenDelay: 1, errorHandler: { error in
                 // Handle error.
                 print(error)
             })
             
-        case ButtonStates.Searching.hashValue:
+        case ButtonState.CentralSearching:
             
             // User wants to stop searching..
+            if let selectedIndexPaths = table.indexPathsForSelectedRows {
+                for indexPath in selectedIndexPaths {
+                    table.deselectRow(at: indexPath, animated: true)
+                    let cell = table.cellForRow(at: indexPath)!
+                    cell.accessoryType = .none
+                }
+            }
+            
             central.interruptScan()
+            removeSpinner()
             button.setTitle("Search", for: .normal)
-            button.currentState = ButtonStates.Idle.hashValue
+            button.backgroundColor = BlueColor
+            state = .CentralIdle
             
         // 3 - Peripheral
-        case ButtonStates.ReadyToConnect.hashValue:
-            
-            // Generate key for chat.
-            self.key = Encryption.createKey().key
+        case ButtonState.PeripheralAskingToConnect:
             
             // Generate data that will be sent to central.
-            let dataString = "user_id_and_key \(Cache.loadUser().id) \(key)"
+            let dataString = "user_id \(Cache.loadUser().id)"
             
             // Send data baby.
+            pushSpinner(message: "", frame: table.frame)
             peripheral.sendData(dataString.data(using: .utf8)!, toRemotePeer: self.remoteCentral!, completionHandler: {
                 (data, remotePeer, error) -> Void in
                 if error != nil {
@@ -305,6 +339,29 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
                 }
                 remotePeer.delegate = self
             })
+            
+        case ButtonState.CentralReadyToConnect:
+            state = .CentralSearching
+            button.setTitle("Stop", for: .normal)
+            
+            let selectedDiscoveries = table.indexPathsForSelectedRows!.map({
+                indexPath -> BKDiscovery in
+                return self.discoveries[indexPath.row]
+            })
+            
+            pushSpinner(message: "", frame: table.frame)
+            for discovery in selectedDiscoveries {
+                central.connect(remotePeripheral: discovery.remotePeripheral, completionHandler: {
+                    (remotePeripheral, error) in
+                    if error != nil {
+                        // Handle error.
+                        print(error)
+                        return
+                    }
+                    // If no error, you're ready to receive data!
+                    remotePeripheral.delegate = self
+                })
+            }
             
         default:
             print("what the heck?")
@@ -333,8 +390,10 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     }
 }
 
-enum ButtonStates {
-    case Idle
-    case Searching
-    case ReadyToConnect
+enum ButtonState {
+    case CentralIdle
+    case CentralSearching
+    case CentralReadyToConnect
+    case CentralConnecting
+    case PeripheralAskingToConnect
 }

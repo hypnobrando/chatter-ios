@@ -115,6 +115,33 @@ class ChatVC: JSQMessagesViewController {
         return cell
     }
     
+    override func collectionView(_ collectionView: JSQMessagesCollectionView, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath) -> NSAttributedString?
+    {
+        let message = messages[indexPath.item]
+        
+        if message.senderId == senderId() {
+            return nil
+        } else {
+            
+            return NSAttributedString(string: message.senderDisplayName)
+            
+        }
+        
+    }
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout, heightForMessageBubbleTopLabelAt indexPath: IndexPath) -> CGFloat {
+        
+        let message = messages[indexPath.item]
+        
+        if message.senderId == senderId() {
+            return 0.0
+        } else {
+            
+            return 17.0
+            
+        }
+    }
+    
     override func collectionView(_ collectionView: JSQMessagesCollectionView, avatarImageDataForItemAt indexPath: IndexPath) -> JSQMessageAvatarImageDataSource? {
         return nil
     }
