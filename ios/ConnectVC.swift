@@ -48,7 +48,6 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         // Setup bluetooth.
         BT_LOCAL_NAME = Cache.loadUser().fullName()
         peripheral.delegate = self
-        broadcastBT()
         central.delegate = self
         central.addAvailabilityObserver(self)
         listenBT()
@@ -87,7 +86,6 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         return UITableViewAutomaticDimension
     }
     
-    // 1 - Central
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath)!
         cell.accessoryType = .checkmark
@@ -110,6 +108,8 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     // Bluetooth Remote Peripheral Delegate
     
     func remotePeer(_ remotePeer: BKRemotePeer, didSendArbitraryData data: Data) {
+        state = .DataTransferring
+        
         // Parse data.
         let dataString = String(data: data, encoding: String.Encoding.utf8)!
         let components = dataString.components(separatedBy: " ")
@@ -117,12 +117,10 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         
         switch type {
         
-        // 4a - Central
         case "user_id":
             let remoteUserId = components[1]
             handleUserId(remoteUserId: remoteUserId, remotePeer: remotePeer)
             
-        // 5a - Peripheral
         case "chat_id_and_key":
             let chatId = components[1]
             let key = components[2]
@@ -135,8 +133,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
             print("what the heck?")
         }
     }
-    
-    // 4b - Central
+
     func handleUserId(remoteUserId: String, remotePeer: BKRemotePeer) {
         connectedPeripherals.append((remotePeer, remoteUserId))
         
@@ -184,7 +181,6 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         })
     }
     
-    // 5b - Peripheral
     func handleChatIdAndKey(chatId: String, key: String) {
         // Cache chat id.
         Cache.setChatKey(chatId: chatId, key: key)
@@ -196,8 +192,6 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     }
 
     // Bluetooth Peripheral Delegate
-    
-    // 2 - Peripheral
     func peripheral(_ peripheral: BKPeripheral, remoteCentralDidConnect remoteCentral: BKRemoteCentral) {
         // Find which user this is.
         
@@ -221,14 +215,26 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     }
     
     func peripheral(_ peripheral: BKPeripheral, remoteCentralDidDisconnect remoteCentral: BKRemoteCentral) {
-        print("remoteCentralDidDisconnect")
+        if state == .DataTransferring {
+            return
+        }
+        
+        pushAlertView(title: "Error", message: "Someone disconnected.  Try again.")
+        
+        restartBT()
         return
     }
     
     // Bluetooth Central Delegate
     
     func central(_ central: BKCentral, remotePeripheralDidDisconnect remotePeripheral: BKRemotePeripheral) {
-        print("remotePeripheralDidDisconnect")
+        if state == .DataTransferring {
+            return
+        }
+        
+        pushAlertView(title: "Error", message: "Someone disconnected.  Try again.")
+        
+        restartBT()
         return
     }
     
@@ -236,12 +242,13 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     
     func availabilityObserver(_ availabilityObservable: BKAvailabilityObservable, availabilityDidChange availability: BKAvailability) {
         if availability != BKAvailability.available {
-            print("Please turn on bluetooth.")
+            pushAlertView(title: "Bluetooth Off", message: "Please turn on bluetooth.")
             return
         }
     }
     
     func availabilityObserver(_ availabilityObservable: BKAvailabilityObservable, unavailabilityCauseDidChange unavailabilityCause: BKUnavailabilityCause) {
+        print("unavailabilityCauseDidChange")
         return
     }
     
@@ -274,16 +281,18 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         
         switch state {
         case ButtonState.CentralIdle:
-            
             // User wants to start searching so lets do it baby.
+            
             button.setTitle("Stop", for: .normal)
             state = .CentralSearching
+            broadcastBT()
             central.scanContinuouslyWithChangeHandler({
                 (changes, discoveries) in
                 // Handle changes to "availabile" discoveries, [BKDiscoveriesChange].
                 // Handle current "available" discoveries, [BKDiscovery].
                 // This is where you'd ie. update a table view.
                 print(changes, discoveries)
+                
                 
                 if changes.count == 0 {
                     return
@@ -307,24 +316,12 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
             })
             
         case ButtonState.CentralSearching:
-            
-            // User wants to stop searching..
-            if let selectedIndexPaths = table.indexPathsForSelectedRows {
-                for indexPath in selectedIndexPaths {
-                    table.deselectRow(at: indexPath, animated: true)
-                    let cell = table.cellForRow(at: indexPath)!
-                    cell.accessoryType = .none
-                }
-            }
-            
-            central.interruptScan()
-            removeSpinner()
-            button.setTitle("Search", for: .normal)
-            button.backgroundColor = BlueColor
-            state = .CentralIdle
-            
-        // 3 - Peripheral
+            // User wants to stop searching.
+            restartBT()
+        
         case ButtonState.PeripheralAskingToConnect:
+            // Peripheral wants to send data to central.
+            state = .DataTransferring
             
             // Generate data that will be sent to central.
             let dataString = "user_id \(Cache.loadUser().id)"
@@ -341,6 +338,8 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
             })
             
         case ButtonState.CentralReadyToConnect:
+            // Central ready to connect and wait for peripherals to send data.
+            
             state = .CentralSearching
             button.setTitle("Stop", for: .normal)
             
@@ -368,7 +367,6 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         }
     }
     
-    // 6
     func goToMainMenu() {
         do {
             try central.stop()
@@ -388,6 +386,21 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
             print(error)
         }
     }
+    
+    func restartBT() {
+        discoveries = [BKDiscovery]()
+        table.reloadData()
+        do {
+            try central.interruptScan()
+            try peripheral.stop()
+        } catch let error {
+            print(error)
+        }
+        removeSpinner()
+        button.setTitle("Search", for: .normal)
+        button.backgroundColor = BlueColor
+        state = .CentralIdle
+    }
 }
 
 enum ButtonState {
@@ -396,4 +409,5 @@ enum ButtonState {
     case CentralReadyToConnect
     case CentralConnecting
     case PeripheralAskingToConnect
+    case DataTransferring
 }
