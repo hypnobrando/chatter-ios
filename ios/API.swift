@@ -187,6 +187,51 @@ class API {
         })
     }
     
+    class func patchChat(userId: String, chatId: String, title: String, completionHandler: @escaping (URLResponse) -> Void) {
+        let json = ["title": title]
+        API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)/chats/\(chatId)", json: json, token: nil, completionHandler: {
+            (response, data) in
+            
+            if let _ = data as? URLResponse {
+                return completionHandler(URLResponse.ServerDown)
+            }
+            
+            if response == nil {
+                return completionHandler(URLResponse.NotConnected)
+            }
+            
+            let data = data as! [String : Any]
+            if data["error"] != nil {
+                return completionHandler(URLResponse.Error)
+            }
+            
+            completionHandler(URLResponse.Success)
+        })
+    }
+    
+    class func patchChatAddUsers(userId: String, chatId: String, userIdsToAdd: [String], completionHandler: @escaping (URLResponse, Chat?) -> Void) {
+        let json = ["user_ids" : userIdsToAdd]
+        API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)/chats/\(chatId)/add_users", json: json, token: nil, completionHandler: {
+            (response, data) in
+            
+            if let _ = data as? URLResponse {
+                return completionHandler(URLResponse.ServerDown, nil)
+            }
+            
+            if response == nil {
+                return completionHandler(URLResponse.NotConnected, nil)
+            }
+            
+            let data = data as! [String : Any]
+            if data["error"] != nil {
+                return completionHandler(URLResponse.Error, nil)
+            }
+            
+            let chat = Chat.deserialize(json: data["chat"] as! [String : Any])
+            completionHandler(URLResponse.Success, chat)
+        })
+    }
+    
     // HELPERS
     
     class func loadMessageFromData(data: [String : Any]) -> [String : Any] {

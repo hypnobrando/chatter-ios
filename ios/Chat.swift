@@ -12,17 +12,20 @@ class Chat {
     var id : String
     var users : [Contact]
     var messages : [Message]
+    var title : String
     
     init() {
         id = ""
         users = [Contact]()
         messages = [Message]()
+        title = ""
     }
     
-    init(id: String, users: [Contact], messages: [Message]) {
+    init(id: String, users: [Contact], messages: [Message], title: String) {
         self.id = id
         self.users = users
         self.messages = messages
+        self.title = title
     }
     
     class func deserialize(json: [String:Any]) -> Chat {
@@ -48,7 +51,9 @@ class Chat {
 
         }
         
-        return Chat(id: json["_id"] as! String, users: users, messages: messages)
+        let title = json["title"] as? String
+        
+        return Chat(id: json["_id"] as! String, users: users, messages: messages, title: title == nil ? "" : title!)
     }
     
     func getNamesExceptFor(user: Contact) -> String {
@@ -61,5 +66,13 @@ class Chat {
         }
         
         return String(names.characters.dropLast(2))
+    }
+    
+    func ChatNameGivenUser(user: Contact) -> String {
+        if title == "" {
+            return getNamesExceptFor(user: user)
+        }
+        
+        return title
     }
 }

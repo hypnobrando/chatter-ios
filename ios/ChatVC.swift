@@ -10,10 +10,15 @@ import JSQMessagesViewController
 
 class ChatVC: JSQMessagesViewController {
     
+    let INFO_BUTTON_WIDTH : CGFloat = 45.0
+    let RIGHT_MARGIN : CGFloat = 10.0
+    
     var chat = Chat()
     var messages = [JSQMessage]()
     var enc = Encryption()
     var sending = false
+    
+    var chatInfoButton = UIButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +28,14 @@ class ChatVC: JSQMessagesViewController {
         
         // Set up background.
         view.backgroundColor = UIColor.white
-        title = chat.getNamesExceptFor(user: Cache.loadUser())
+        title = chat.ChatNameGivenUser(user: Cache.loadUser())
+        
+        // Setup chat info button.
+        chatInfoButton = UIButton(frame: CGRect(x: navigationController!.navigationBar.bounds.maxX - INFO_BUTTON_WIDTH - RIGHT_MARGIN, y: navigationController!.navigationBar.bounds.maxY - INFO_BUTTON_WIDTH, width: INFO_BUTTON_WIDTH, height: INFO_BUTTON_WIDTH))
+        chatInfoButton.backgroundColor = .clear
+        chatInfoButton.setTitle("info", for: .normal)
+        chatInfoButton.addTarget(self, action: #selector(chatInfoButtonPressed), for: .touchUpInside)
+        navigationController!.navigationBar.addSubview(chatInfoButton)
         
         // Setup messages.
         collectionView!.collectionViewLayout.incomingAvatarViewSize = CGSize.zero
@@ -33,6 +45,10 @@ class ChatVC: JSQMessagesViewController {
         // Load messages
         pushSpinner(message: "", frame: view.frame)
         loadMessages()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        chatInfoButton.alpha = 1.0
     }
     
     override func didReceiveMemoryWarning() {
@@ -169,12 +185,28 @@ class ChatVC: JSQMessagesViewController {
         })
     }
     
+    func chatInfoButtonPressed(sender: UIButton!) {
+        chatInfoButton.alpha = 0.0
+        
+        let chatInfoVC = ChatInfoVC()
+        chatInfoVC.chat = chat
+        navigationController!.pushViewController(chatInfoVC, animated: true)
+    }
+    
     override func pushNotificationReceived(payload: [String:Any]) {
-        if let chatId = payload["chat_id"] as? String {
-            if chatId == self.chat.id {
-                loadMessages()
+        if let type = payload["type"] as? String {
+            if let chatId = payload["chat_id"] as? String {
+                if chatId == self.chat.id {
+                    if type == "new_message" || type == "users_added" {
+                        loadMessages()
+                    }
+                }
             }
         }
+    }
+    
+    override func willMove(toParentViewController parent: UIViewController?) {
+        chatInfoButton.removeFromSuperview()
     }
     
     /*

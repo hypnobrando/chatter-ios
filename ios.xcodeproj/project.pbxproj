@@ -18,6 +18,7 @@
 		A82974CD1F34700600DC7B7A /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82974CC1F34700600DC7B7A /* Message.swift */; };
 		A82974D11F353BF200DC7B7A /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82974D01F353BF200DC7B7A /* Encryption.swift */; };
 		A82D16861F3255320088B59D /* ContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82D16851F3255320088B59D /* ContactCell.swift */; };
+		A871C97C1F44F9AE0082E7AB /* ChatInfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A871C97B1F44F9AE0082E7AB /* ChatInfoVC.swift */; };
 		A880EB391F3C0DE000340B2C /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A880EB381F3C0DE000340B2C /* SettingsVC.swift */; };
 		A880EB3B1F3C193300340B2C /* Env.swift in Sources */ = {isa = PBXBuildFile; fileRef = A880EB3A1F3C193300340B2C /* Env.swift */; };
 		A880EB3F1F3C412800340B2C /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A880EB3E1F3C412800340B2C /* Spinner.swift */; };
@@ -47,6 +48,7 @@
 		A82974CE1F3527B900DC7B7A /* ios.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ios.entitlements; path = ios/ios.entitlements; sourceTree = "<group>"; };
 		A82974D01F353BF200DC7B7A /* Encryption.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		A82D16851F3255320088B59D /* ContactCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactCell.swift; sourceTree = "<group>"; };
+		A871C97B1F44F9AE0082E7AB /* ChatInfoVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatInfoVC.swift; sourceTree = "<group>"; };
 		A880EB381F3C0DE000340B2C /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		A880EB3A1F3C193300340B2C /* Env.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Env.swift; sourceTree = "<group>"; };
 		A880EB3E1F3C412800340B2C /* Spinner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 				A82974C11F33ACB500DC7B7A /* ConnectVC.swift */,
 				A880EB381F3C0DE000340B2C /* SettingsVC.swift */,
 				A880EB401F3D58E900340B2C /* PinVC.swift */,
+				A871C97B1F44F9AE0082E7AB /* ChatInfoVC.swift */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -343,6 +346,7 @@
 				A880EB3F1F3C412800340B2C /* Spinner.swift in Sources */,
 				A8AFBC9E1F324E96007A5FEE /* ChatVC.swift in Sources */,
 				A82974CA1F346F3800DC7B7A /* Chat.swift in Sources */,
+				A871C97C1F44F9AE0082E7AB /* ChatInfoVC.swift in Sources */,
 				A880EB481F3E289F00340B2C /* ChatterVC.swift in Sources */,
 				A8AFBC8A1F324C9A007A5FEE /* HomeVC.swift in Sources */,
 				A82974C01F32AE7B00DC7B7A /* TextField.swift in Sources */,

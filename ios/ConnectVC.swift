@@ -17,6 +17,8 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     let BUTTON_HEIGHT : CGFloat = 50.0
     
     var state = ButtonState.CentralIdle
+    var chatType = ChatType.NewChat
+    var existingChat = Chat()
     
     var table = UITableView()
     var button = Button()
@@ -142,43 +144,82 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
             return
         }
         
-        // Create new chat.
         var userIds = connectedPeripherals.map({
             (remotePeer, userId) -> String in
             return userId
         })
-        userIds.append(Cache.loadUser().id)
         
-        API.createChat(userIds: userIds, completionHandler: {
-            (response, chat) in
+        switch chatType {
+        case .NewChat:
+            // Create new chat.
+            userIds.append(Cache.loadUser().id)
             
-            if response != URLResponse.Success {
-                self.pushAlertView(title: "Error", message: "Check your internet connection.")
-                return
-            }
+            API.createChat(userIds: userIds, completionHandler: {
+                (response, chat) in
+                
+                if response != URLResponse.Success {
+                    self.pushAlertView(title: "Error", message: "Check your internet connection.")
+                    return
+                }
+                
+                let key = Encryption.createKey().key
+                let dataString = "chat_id_and_key \(chat!.id) \(key)"
+                
+                // Send chat id to peripheral.
+                for (peer, _) in self.connectedPeripherals {
+                    self.central.sendData(dataString.data(using: .utf8)!, toRemotePeer: peer, completionHandler: {
+                        (data, peer, error) in
+                        
+                        if error != nil {
+                            print(error)
+                            return
+                        }
+                    })
+                }
+                
+                // Cache chat id and key.
+                Cache.setChatKey(chatId: chat!.id, key: key)
+                
+                // Go back to main menu.
+                self.removeSpinner()
+                self.goBack()
+            })
+
+        case .ExistingChat:
+            // Add users to chat.
+            API.patchChatAddUsers(userId: Cache.loadUser().id, chatId: existingChat.id, userIdsToAdd: userIds, completionHandler: {
+                (response, newChat) in
+                
+                if response != URLResponse.Success {
+                    self.pushAlertView(title: "Error", message: "Check your internet connection.")
+                    return
+                }
+                
+                // Send chat id to peripheral.
+                let key = Cache.chatKey(chatId: self.existingChat.id)!
+                let dataString = "chat_id_and_key \(self.existingChat.id) \(key)"
+                
+                for (peer, _) in self.connectedPeripherals {
+                    self.central.sendData(dataString.data(using: .utf8)!, toRemotePeer: peer, completionHandler: {
+                        (data, peer, error) in
+                        
+                        if error != nil {
+                            print(error)
+                            return
+                        }
+                    })
+                }
+                
+                // Go back.
+                self.removeSpinner()
+                let vcs = self.navigationController!.viewControllers
+                (vcs[vcs.count - 2] as! ChatInfoVC).chat = newChat!
+                self.goBack()
+            })
             
-            let key = Encryption.createKey().key
-            let dataString = "chat_id_and_key \(chat!.id) \(key)"
-            
-            // Send chat id to peripheral.
-            for (peer, _) in self.connectedPeripherals {
-                self.central.sendData(dataString.data(using: .utf8)!, toRemotePeer: peer, completionHandler: {
-                    (data, peer, error) in
-                    
-                    if error != nil {
-                        print(error)
-                        return
-                    }
-                })
-            }
-            
-            // Cache chat id and key.
-            Cache.setChatKey(chatId: chat!.id, key: key)
-            
-            // Go back to main menu.
-            self.removeSpinner()
-            self.goToMainMenu()
-        })
+        default:
+            print("what da heck")
+        }
     }
     
     func handleChatIdAndKey(chatId: String, key: String) {
@@ -188,7 +229,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         removeSpinner()
         
         // Go back to main menu.
-        self.goToMainMenu()
+        self.goBack()
     }
 
     // Bluetooth Peripheral Delegate
@@ -200,7 +241,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
             discovery.remotePeripheral.identifier == remoteCentral.identifier
         })
         
-        if connectedDiscovery == nil {
+        if connectedDiscovery == nil || chatType == .ExistingChat {
             peripheral.sendData("disconnect".data(using: .utf8)!, toRemotePeer: remoteCentral, completionHandler: nil)
             return
         }
@@ -367,7 +408,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         }
     }
     
-    func goToMainMenu() {
+    func goBack() {
         do {
             try central.stop()
             try peripheral.stop()
@@ -410,4 +451,9 @@ enum ButtonState {
     case CentralConnecting
     case PeripheralAskingToConnect
     case DataTransferring
+}
+
+enum ChatType {
+    case NewChat
+    case ExistingChat
 }

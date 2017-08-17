@@ -93,7 +93,7 @@ class HomeVC: ChatterVC, UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let chat = chats[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
-        cell.name.text = chat.getNamesExceptFor(user: Cache.loadUser())
+        cell.name.text = chat.ChatNameGivenUser(user: Cache.loadUser())
         return cell
     }
     
