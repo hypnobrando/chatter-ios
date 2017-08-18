@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class Cache {
     static var defaults = UserDefaults.standard
@@ -74,5 +75,44 @@ class Cache {
     static func removePin(){
         defaults.removeObject(forKey: "pin")
         defaults.synchronize()
+    }
+    
+    static func addNewNotification(chatId: String) {
+        if var notificationsDict = defaults.value(forKey: "Notifications") as? [String : Int] {
+            notificationsDict[chatId] = 1
+            defaults.set(notificationsDict, forKey: "Notifications")
+        } else {
+            defaults.set([chatId: 1], forKey: "Notifications")
+        }
+
+        defaults.synchronize()
+        
+        UIApplication.shared.applicationIconBadgeNumber = getNotificationsCount()
+    }
+    
+    static func removeNotifications(chatId: String) {
+        if var notificationsDict = defaults.value(forKey: "Notifications") as? [String : Int] {
+            notificationsDict[chatId] = 0
+            defaults.set(notificationsDict, forKey: "Notifications")
+        } else {
+            defaults.set([chatId: 0], forKey: "Notifications")
+        }
+        
+        defaults.synchronize()
+        
+        UIApplication.shared.applicationIconBadgeNumber = getNotificationsCount()
+    }
+    
+    static func getNotificationsCount() -> Int {
+        if let notificationsDict = defaults.value(forKey: "Notifications") as? [String : Int] {
+            var count = 0
+            for (_, value) in notificationsDict {
+                count += value
+            }
+            
+            return count
+        }
+        
+        return 0
     }
 }

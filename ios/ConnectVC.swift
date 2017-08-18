@@ -13,7 +13,6 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     
     let SERVICE_UUID = UUID(uuidString: "2F6D474A-C5C5-4E39-837D-00C98A87E458")!
     let CHARACTERISTIC_UUID = UUID(uuidString: "EBB708B1-154D-4F9A-AF0A-B4CF1B05D5DF")!
-    var BT_LOCAL_NAME = "Chatter Peripheral"
     let BUTTON_HEIGHT : CGFloat = 50.0
     
     var state = ButtonState.CentralIdle
@@ -48,7 +47,6 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         button.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
         
         // Setup bluetooth.
-        BT_LOCAL_NAME = Cache.loadUser().fullName()
         peripheral.delegate = self
         central.delegate = self
         central.addAvailabilityObserver(self)
@@ -73,11 +71,12 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let discovery = discoveries[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
-        cell.name.text = discovery.localName
+        cell.name.text = discovery.getUsersName()
         
         let selectedIndexPaths = tableView.indexPathsForSelectedRows
         let rowIsSelected = selectedIndexPaths != nil && selectedIndexPaths!.contains(indexPath)
         cell.accessoryType = rowIsSelected ? .checkmark : .none
+        cell.isSelected = rowIsSelected
         
         return cell
     }
@@ -246,7 +245,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
             return
         }
 
-        let name = connectedDiscovery!.localName!
+        let name = connectedDiscovery!.getUsersName()
         
         // Ask user if they want to send data.
         button.backgroundColor = UIColor.red
@@ -297,7 +296,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     
     func broadcastBT() {
         do {
-            let configuration = BKPeripheralConfiguration(dataServiceUUID: SERVICE_UUID, dataServiceCharacteristicUUID: CHARACTERISTIC_UUID, localName: BT_LOCAL_NAME)
+            let configuration = BKPeripheralConfiguration(dataServiceUUID: SERVICE_UUID, dataServiceCharacteristicUUID: CHARACTERISTIC_UUID, localName: Cache.loadUser().fullName())
             try peripheral.startWithConfiguration(configuration)
         } catch let error {
             // TODO - Handle error.
@@ -334,16 +333,17 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
                 // This is where you'd ie. update a table view.
                 print(changes, discoveries)
                 
-                
-                if changes.count == 0 {
+                if changes.count < 1 {
                     return
                 }
                 
+                if self.state == .PeripheralAskingToConnect {
+                    self.restartBT()
+                }
+                
                 // Reload table data.
-                self.discoveries = discoveries.filter({
-                    (discovery) -> Bool in
-                    discovery.localName != nil
-                })
+                self.discoveries = discoveries
+ 
                 self.table.reloadData()
                 
             }, stateHandler: { newState in
@@ -410,7 +410,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     
     func goBack() {
         do {
-            try central.stop()
+            try central.interruptScan()
             try peripheral.stop()
         } catch let error {
             print(error)

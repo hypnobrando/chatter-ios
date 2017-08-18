@@ -26,6 +26,9 @@ class ChatVC: JSQMessagesViewController {
         // Load encryption from cache.
         enc = Encryption(chat: chat)
         
+        // Remove notifications count.
+        Cache.removeNotifications(chatId: chat.id)
+        
         // Set up background.
         view.backgroundColor = UIColor.white
         title = chat.ChatNameGivenUser(user: Cache.loadUser())
@@ -77,8 +80,9 @@ class ChatVC: JSQMessagesViewController {
             self.collectionView?.reloadData()
             self.finishReceivingMessage()
             
-            // Set collection view inset top because JSQMessageVC is fucking buggy.
-            self.collectionView?.contentInset.top = (self.navigationController?.navigationBar.frame.height)! + 16.0
+            // Set collection view inset top because JSQMessageVC is fucking buggy (only if there are <= than 10 messages...).
+            let extra : CGFloat = self.messages.count <= 10 ? self.navigationController!.navigationBar.frame.height + 16.0 : 0.0
+            self.collectionView?.contentInset.top = extra
         })
     }
     

@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Register for Push Notifications.
         let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .sound]) { (granted, error) in
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
             // actions based on whether notifications were authorized or not
         }
         application.registerForRemoteNotifications()
@@ -72,9 +72,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let top = topViewController()
         
-        if let payload = userInfo as? [String : Any] {
-            top?.pushNotificationReceived(payload: payload)
+        switch application.applicationState {
+        case .active:
+            if let payload = userInfo as? [String : Any] {
+                if let type = payload["type"] as? String {
+                    if let chatId = payload["chat_id"] as? String {
+                        Cache.addNewNotification(chatId: chatId)
+                    }
+                }
+                
+                top?.pushNotificationReceived(payload: payload)
+            }
+
+        case .background:
+            if let payload = userInfo as? [String : Any] {
+                if let type = payload["type"] as? String {
+                    if let chatId = payload["chat_id"] as? String {
+                        Cache.addNewNotification(chatId: chatId)
+                    }
+                }
+            }
+
+        case .inactive:
+            if let payload = userInfo as? [String : Any] {
+                if let type = payload["type"] as? String {
+                    if let chatId = payload["chat_id"] as? String {
+                        Cache.addNewNotification(chatId: chatId)
+                    }
+                }
+            }
+
+        default:
+            print("what da...")
         }
+        
         completionHandler(.newData)
     }
     
