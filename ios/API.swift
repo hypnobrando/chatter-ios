@@ -86,9 +86,8 @@ class API {
             }
             
             let chatJson = loadMessageFromData(data: data)
-
+            print(chatJson)
             let chat = Chat.deserialize(json: chatJson)
-            
             completionHandler(URLResponse.Success, chat)
         })
     }

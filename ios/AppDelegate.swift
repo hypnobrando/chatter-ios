@@ -20,7 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Register for Push Notifications.
         let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
+        center.requestAuthorization(options: [.alert, .sound, .badge]) {
+            (granted, error) in
             // actions based on whether notifications were authorized or not
         }
         application.registerForRemoteNotifications()

@@ -36,8 +36,29 @@ class Contact {
         return String(id)
     }
     
-    class func deserialize(json: [String:String]) -> Contact {
-        return Contact(firstName: json["first_name"]!, lastName: json["last_name"]!, id: json["_id"]!, apnToken: json["apn_token"]!)
+    class func deserialize(json: [String:Any]) -> Contact {
+        var firstName = ""
+        var lastName = ""
+        var id = ""
+        var apnToken = ""
+        
+        if let jsonFirstName = json["first_name"] as? String {
+            firstName = jsonFirstName
+        }
+        
+        if let jsonLastName = json["last_name"] as? String {
+            lastName = jsonLastName
+        }
+        
+        if let jsonId = json["_id"] as? String {
+            id = jsonId
+        }
+        
+        if let jsonApnToken = json["apn_token"] as? String {
+            apnToken = jsonApnToken
+        }
+        
+        return Contact(firstName: firstName, lastName: lastName, id: id, apnToken: apnToken)
     }
     
     func isEmpty() -> Bool {

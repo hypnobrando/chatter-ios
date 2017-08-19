@@ -32,10 +32,10 @@ class Chat {
         
         var users = [Contact]()
         
-        if let jsonUsers = json["users"] as? [[String:String]] {
+        if let jsonUsers = json["users"] as? [[String:Any]] {
             users = jsonUsers.map({
-                json -> Contact in
-                Contact.deserialize(json: json)
+                jsonUser -> Contact in
+                Contact.deserialize(json: jsonUser)
             })
         }
         
