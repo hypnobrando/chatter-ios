@@ -79,7 +79,7 @@ class Cache {
     
     static func addNewNotification(chatId: String) {
         if var notificationsDict = defaults.value(forKey: "Notifications") as? [String : Int] {
-            notificationsDict[chatId] = 1
+            notificationsDict[chatId] = notificationsDict[chatId] == nil ? 1 : notificationsDict[chatId]! + 1
             defaults.set(notificationsDict, forKey: "Notifications")
         } else {
             defaults.set([chatId: 1], forKey: "Notifications")
@@ -111,6 +111,14 @@ class Cache {
             }
             
             return count
+        }
+        
+        return 0
+    }
+    
+    static func getNotificationsCountFor(chatId: String) -> Int {
+        if let notificationsDict = defaults.value(forKey: "Notifications") as? [String : Int] {
+            return notificationsDict[chatId] == nil ? 0 : notificationsDict[chatId]!
         }
         
         return 0
