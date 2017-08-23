@@ -109,5 +109,33 @@ class HomeVC: ChatterVC, UITableViewDataSource, UITableViewDelegate {
         navigationController?.pushViewController(chatVC, animated: true)
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if (editingStyle == UITableViewCellEditingStyle.delete) {
+            // handle delete (by removing the data from your array and updating the tableview)
+            pushAlertActionView(title: "Are you sure?", message: "This action cannot be undone.", handler: {
+                _ in
+                
+                let chat = self.chats[indexPath.row]
+                self.pushSpinner(message: "", frame: self.table.frame)
+                API.removeUserFromChat(userId: Cache.loadUser().id, chatId: chat.id, completionHandler: {
+                    (response) in
+                    self.removeSpinner()
+                    
+                    if response != URLResponse.Success {
+                        self.pushAlertView(title: "Error", message: "Check your internet connection.")
+                    }
+                    
+                    Cache.removeNotifications(chatId: chat.id)
+                    self.chats.remove(at: indexPath.row)
+                    self.table.reloadData()
+                })
+            })
+        }
+    }
 }
 

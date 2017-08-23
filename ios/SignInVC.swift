@@ -62,11 +62,12 @@ class SignInVC: ChatterVC, UITextFieldDelegate {
         
         let apnToken = Cache.loadUser().apnToken
 
+        /*
         if apnToken == "" {
-            // TODO - warn user.
             pushAlertView(title: "Error", message: "Please enable push notifications")
             return
         }
+        */
             
         // Transition to next vc.
         let pin = PinVC()

@@ -231,6 +231,27 @@ class API {
         })
     }
     
+    class func removeUserFromChat(userId: String, chatId: String, completionHandler: @escaping (URLResponse) -> Void) {
+        API.performRequest(requestType: "DELETE", urlPath: "users/\(userId)/chats/\(chatId)", json: nil, token: nil, completionHandler: {
+            (response, data) in
+            
+            if let _ = data as? URLResponse {
+                return completionHandler(URLResponse.ServerDown)
+            }
+            
+            if response == nil {
+                return completionHandler(URLResponse.NotConnected)
+            }
+            
+            let data = data as! [String : Any]
+            if data["error"] != nil {
+                return completionHandler(URLResponse.Error)
+            }
+            
+            completionHandler(URLResponse.Success)
+        })
+    }
+    
     // HELPERS
     
     class func loadMessageFromData(data: [String : Any]) -> [String : Any] {
@@ -276,7 +297,6 @@ class API {
                 if (error != nil) {
                     
                     if error!.localizedDescription == "Could not connect to the server." {
-                        print("couldnt connect to server")
                         return DispatchQueue.main.async {
                             completionHandler(nil, URLResponse.ServerDown)
                         }

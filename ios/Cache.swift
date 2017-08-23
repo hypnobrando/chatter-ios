@@ -123,4 +123,15 @@ class Cache {
         
         return 0
     }
+    
+    static func removeAllNotifications() {
+        if var notificationsDict = defaults.value(forKey: "Notifications") as? [String : Int] {
+            notificationsDict = [String : Int]()
+            defaults.set(notificationsDict, forKey: "Notifications")
+        }
+        
+        defaults.synchronize()
+        
+        UIApplication.shared.applicationIconBadgeNumber = getNotificationsCount()
+    }
 }

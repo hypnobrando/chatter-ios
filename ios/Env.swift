@@ -8,5 +8,11 @@
 
 import Foundation
 
+
 let ENV = "testing"
 let CHATTER_URL = "https://api.chatter-testing.bep-projects.com/"
+
+/*
+let ENV = "development"
+let CHATTER_URL = "http://127.0.0.1:8080/"
+ */

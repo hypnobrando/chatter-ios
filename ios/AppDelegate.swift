@@ -30,6 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //Cache.clear()
         //Cache.setPin(pin: "3131")
+        //Cache.removeAllNotifications()
         
         loadApp()
         
