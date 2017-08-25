@@ -48,10 +48,10 @@ class Cache {
     }
     
     static func clear() {
-        defaults.removeObject(forKey: "first_name")
-        defaults.removeObject(forKey: "last_name")
-        defaults.removeObject(forKey: "id")
+        defaults.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         defaults.synchronize()
+        
+        UIApplication.shared.applicationIconBadgeNumber = getNotificationsCount()
     }
     
     static func chatKey(chatId: String) -> String? {

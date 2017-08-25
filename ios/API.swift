@@ -23,22 +23,17 @@ class API {
         API.performRequest(requestType: "POST", urlPath: "users", json: json, token: nil, completionHandler: {
             (response, data) in
             
-            if let _ = data as? URLResponse {
-                return completionHandler(URLResponse.ServerDown, nil)
-            }
-            
-            if response == nil {
-                return completionHandler(URLResponse.NotConnected, nil)
-            }
-            
-            let data = data as! [String : Any]
-            if data["error"] != nil {
-                return completionHandler(URLResponse.Error, nil)
-            }
-            
-            let userJson = data["user"] as! [String : String]
-            let contact = Contact.deserialize(json: userJson)
-            completionHandler(URLResponse.Success, contact)
+            handleResponse(response: response, data: data, completionHandler: {
+                response, json in
+                
+                if response != URLResponse.Success {
+                    return completionHandler(response, nil)
+                }
+                
+                let userJson = json!["user"] as! [String : String]
+                let contact = Contact.deserialize(json: userJson)
+                completionHandler(URLResponse.Success, contact)
+            })
         })
     }
     
@@ -47,22 +42,17 @@ class API {
         API.performRequest(requestType: "GET", urlPath: "users/\(userId)/chats", json: nil, token: nil, completionHandler: {
             (response, data) in
             
-            if let _ = data as? URLResponse {
-                return completionHandler(URLResponse.ServerDown, nil)
-            }
-            
-            if response == nil {
-                return completionHandler(URLResponse.NotConnected, nil)
-            }
-            
-            let data = data as! [String : Any]
-            if data["error"] != nil {
-                return completionHandler(URLResponse.Error, nil)
-            }
-            
-            let chatsJson = data["chats"] as! [[String : Any]]
-            let chats = chatsJson.map({ (chat) -> Chat in Chat.deserialize(json: chat)})
-            completionHandler(URLResponse.Success, chats)
+            handleResponse(response: response, data: data, completionHandler: {
+                response, json in
+                
+                if response != URLResponse.Success {
+                    return completionHandler(response, nil)
+                }
+                
+                let chatsJson = json!["chats"] as! [[String : Any]]
+                let chats = chatsJson.map({ (chat) -> Chat in Chat.deserialize(json: chat)})
+                completionHandler(URLResponse.Success, chats)
+            })
         })
     }
     
@@ -72,23 +62,17 @@ class API {
         API.performRequest(requestType: "GET", urlPath: "chats/\(chatId)/messages", json: nil, token: nil, completionHandler: {
             (response, data) in
             
-            if let _ = data as? URLResponse {
-                return completionHandler(URLResponse.ServerDown, nil)
-            }
-            
-            if response == nil {
-                return completionHandler(URLResponse.NotConnected, nil)
-            }
-            
-            let data = data as! [String : Any]
-            if data["error"] != nil {
-                return completionHandler(URLResponse.Error, nil)
-            }
-            
-            let chatJson = loadMessageFromData(data: data)
-            print(chatJson)
-            let chat = Chat.deserialize(json: chatJson)
-            completionHandler(URLResponse.Success, chat)
+            handleResponse(response: response, data: data, completionHandler: {
+                response, json in
+                
+                if response != URLResponse.Success {
+                    return completionHandler(response, nil)
+                }
+                
+                let chatJson = loadMessageFromData(data: json!)
+                let chat = Chat.deserialize(json: chatJson)
+                completionHandler(URLResponse.Success, chat)
+            })
         })
     }
     
@@ -98,23 +82,18 @@ class API {
         API.performRequest(requestType: "POST", urlPath: "users/\(userId)/chats/\(chatId)/messages", json: json, token: nil, completionHandler: {
             (response, data) in
             
-            if let _ = data as? URLResponse {
-                return completionHandler(URLResponse.ServerDown, nil)
-            }
-            
-            if response == nil {
-                return completionHandler(URLResponse.NotConnected, nil)
-            }
-            
-            let data = data as! [String : Any]
-            if data["error"] != nil {
-                return completionHandler(URLResponse.Error, nil)
-            }
-            
-            let chatJson = loadMessageFromData(data: data)
-            let chat = Chat.deserialize(json: chatJson)
-            
-            completionHandler(URLResponse.Success, chat)
+            handleResponse(response: response, data: data, completionHandler: {
+                response, json in
+                
+                if response != URLResponse.Success {
+                    return completionHandler(response, nil)
+                }
+                
+                let chatJson = loadMessageFromData(data: json!)
+                let chat = Chat.deserialize(json: chatJson)
+                
+                completionHandler(URLResponse.Success, chat)
+            })
         })
     }
     
@@ -124,41 +103,28 @@ class API {
         API.performRequest(requestType: "POST", urlPath: "chats", json: json, token: nil, completionHandler: {
             (response, data) in
             
-            if let _ = data as? URLResponse {
-                return completionHandler(URLResponse.ServerDown, nil)
-            }
-            
-            if response == nil {
-                return completionHandler(URLResponse.NotConnected, nil)
-            }
-            
-            let data = data as! [String : Any]
-            if data["error"] != nil {
-                return completionHandler(URLResponse.Error, nil)
-            }
-            
-            let chat = Chat.deserialize(json: data["chat"] as! [String : Any])
-            completionHandler(URLResponse.Success, chat)
+            handleResponse(response: response, data: data, completionHandler: {
+                response, json in
+                
+                if response != URLResponse.Success {
+                    return completionHandler(response, nil)
+                }
+                
+                let chat = Chat.deserialize(json: json!["chat"] as! [String : Any])
+                completionHandler(URLResponse.Success, chat)
+            })
         })
     }
     
     class func deleteUser(userId: String, completionHandler: @escaping (URLResponse) -> Void) {
         API.performRequest(requestType: "DELETE", urlPath: "users/\(userId)", json: nil, token: nil, completionHandler: {
             (response, data) in
-            if let _ = data as? URLResponse {
-                return completionHandler(URLResponse.ServerDown)
-            }
             
-            if response == nil {
-                return completionHandler(URLResponse.NotConnected)
-            }
-            
-            let data = data as! [String : Any]
-            if data["error"] != nil {
-                return completionHandler(URLResponse.Error)
-            }
-            
-            completionHandler(URLResponse.Success)
+            handleResponse(response: response, data: data, completionHandler: {
+                response, _ in
+                
+                completionHandler(response)
+            })
         })
     }
     
@@ -167,22 +133,17 @@ class API {
         API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)", json: json, token: nil, completionHandler: {
             (response, data) in
             
-            if let _ = data as? URLResponse {
-                return completionHandler(URLResponse.ServerDown, nil)
-            }
-            
-            if response == nil {
-                return completionHandler(URLResponse.NotConnected, nil)
-            }
-            
-            let data = data as! [String : Any]
-            if data["error"] != nil {
-                return completionHandler(URLResponse.Error, nil)
-            }
-            
-            let userJson = data["user"] as! [String : String]
-            let contact = Contact.deserialize(json: userJson)
-            completionHandler(URLResponse.Success, contact)
+            handleResponse(response: response, data: data, completionHandler: {
+                response, json in
+                
+                if response != URLResponse.Success {
+                    return completionHandler(response, nil)
+                }
+                
+                let userJson = json!["user"] as! [String : String]
+                let contact = Contact.deserialize(json: userJson)
+                completionHandler(URLResponse.Success, contact)
+            })
         })
     }
     
@@ -191,20 +152,11 @@ class API {
         API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)/chats/\(chatId)", json: json, token: nil, completionHandler: {
             (response, data) in
             
-            if let _ = data as? URLResponse {
-                return completionHandler(URLResponse.ServerDown)
-            }
-            
-            if response == nil {
-                return completionHandler(URLResponse.NotConnected)
-            }
-            
-            let data = data as! [String : Any]
-            if data["error"] != nil {
-                return completionHandler(URLResponse.Error)
-            }
-            
-            completionHandler(URLResponse.Success)
+            handleResponse(response: response, data: data, completionHandler: {
+                response, _ in
+                
+                completionHandler(response)
+            })
         })
     }
     
@@ -213,21 +165,16 @@ class API {
         API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)/chats/\(chatId)/add_users", json: json, token: nil, completionHandler: {
             (response, data) in
             
-            if let _ = data as? URLResponse {
-                return completionHandler(URLResponse.ServerDown, nil)
-            }
-            
-            if response == nil {
-                return completionHandler(URLResponse.NotConnected, nil)
-            }
-            
-            let data = data as! [String : Any]
-            if data["error"] != nil {
-                return completionHandler(URLResponse.Error, nil)
-            }
-            
-            let chat = Chat.deserialize(json: data["chat"] as! [String : Any])
-            completionHandler(URLResponse.Success, chat)
+            handleResponse(response: response, data: data, completionHandler: {
+                response, json in
+                
+                if response != URLResponse.Success {
+                    return completionHandler(response, nil)
+                }
+                
+                let chat = Chat.deserialize(json: json!["chat"] as! [String : Any])
+                completionHandler(URLResponse.Success, chat)
+            })
         })
     }
     
@@ -235,26 +182,42 @@ class API {
         API.performRequest(requestType: "DELETE", urlPath: "users/\(userId)/chats/\(chatId)", json: nil, token: nil, completionHandler: {
             (response, data) in
             
-            if let _ = data as? URLResponse {
-                return completionHandler(URLResponse.ServerDown)
-            }
-            
-            if response == nil {
-                return completionHandler(URLResponse.NotConnected)
-            }
-            
-            let data = data as! [String : Any]
-            if data["error"] != nil {
-                return completionHandler(URLResponse.Error)
-            }
-            
-            completionHandler(URLResponse.Success)
+            handleResponse(response: response, data: data, completionHandler: {
+                response, _ in
+
+                completionHandler(response)
+            })
         })
     }
     
     // HELPERS
     
-    class func loadMessageFromData(data: [String : Any]) -> [String : Any] {
+    private class func handleResponse(response: HTTPURLResponse?, data: Any?, completionHandler: (URLResponse, [String : Any]?) -> Void) {
+        if response == nil {
+            return completionHandler(URLResponse.Error, nil)
+        }
+        
+        switch response!.statusCode {
+        case 500:
+            return completionHandler(URLResponse.ServerError, nil)
+        case 400:
+            return completionHandler(URLResponse.Error, nil)
+        default:
+            break
+        }
+        
+        if let json = data as? [String : Any] {
+            if json["error"] != nil {
+                return completionHandler(URLResponse.Error, nil)
+            }
+            
+            return completionHandler(URLResponse.Success, json)
+        }
+        
+        completionHandler(URLResponse.Error, nil)
+    }
+    
+    private class func loadMessageFromData(data: [String : Any]) -> [String : Any] {
         let messagesJson = data["messages"] as! [[String : Any]]
         var chatJson = data["chat"] as! [String : Any]
         let usersJson = data["users"] as! [[String : Any]]
@@ -264,7 +227,7 @@ class API {
         return chatJson
     }
     
-    class func performRequest(requestType: String, urlPath: String, json: [String: Any]?, token: String?, completionHandler: @escaping (HTTPURLResponse?, Any?) -> Void) {
+    private class func performRequest(requestType: String, urlPath: String, json: [String: Any]?, token: String?, completionHandler: @escaping (HTTPURLResponse?, Any?) -> Void) {
         
         // Make url request.
         var request = URLRequest(url: URL(string: API.rootURLString + urlPath)!)
@@ -295,16 +258,7 @@ class API {
                 
                 // Handle errors.
                 if (error != nil) {
-                    
-                    if error!.localizedDescription == "Could not connect to the server." {
-                        return DispatchQueue.main.async {
-                            completionHandler(nil, URLResponse.ServerDown)
-                        }
-                    }
-                    
-                    return DispatchQueue.main.async {
-                        completionHandler(nil, nil)
-                    }
+                    return completionHandler(nil, nil)
                 }
                 
                 if let http_response = response as? HTTPURLResponse {
@@ -317,9 +271,7 @@ class API {
                         json_response = nil
                     }
                     
-                    return DispatchQueue.main.async {
-                        completionHandler(http_response, json_response)
-                    }
+                    return completionHandler(http_response, json_response)
                 }
                 
             }
@@ -331,6 +283,7 @@ class API {
 enum URLResponse {
     case Success
     case ServerDown
+    case ServerError
     case Error
     case NotConnected
 }

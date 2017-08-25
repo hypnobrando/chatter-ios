@@ -88,6 +88,7 @@ class SettingsVC: ChatterVC, UITextFieldDelegate {
                 }
                 
                 Cache.clear()
+                
                 let signInVC = SignInVC()
                 self.present(signInVC, animated: true, completion: nil)
             })

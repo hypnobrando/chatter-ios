@@ -5,3 +5,7 @@
 * `pod install` to install dependencies
 * `open ios.xcworkspace` to open the app in xcode
 * click the run button
+
+### todo:
+* use session tokens
+* refresh apn token as often as possible
