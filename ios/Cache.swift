@@ -134,4 +134,17 @@ class Cache {
         
         UIApplication.shared.applicationIconBadgeNumber = getNotificationsCount()
     }
+    
+    static func cacheSessionToke(sessionToken: String) {
+        defaults.set(sessionToken, forKey: "SessionToken")
+        defaults.synchronize()
+    }
+    
+    static func getSessionToken() -> String {
+        if let sessionToken = defaults.value(forKey: "SessionToken") as? String {
+            return sessionToken
+        }
+        
+        return ""
+    }
 }

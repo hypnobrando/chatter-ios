@@ -7,5 +7,4 @@
 * click the run button
 
 ### todo:
-* use session tokens
 * refresh apn token as often as possible

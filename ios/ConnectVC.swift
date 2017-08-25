@@ -153,7 +153,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
             // Create new chat.
             userIds.append(Cache.loadUser().id)
             
-            API.createChat(userIds: userIds, completionHandler: {
+            API.createChat(userId: Cache.loadUser().id, userIds: userIds, completionHandler: {
                 (response, chat) in
                 
                 if response != URLResponse.Success {

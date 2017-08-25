@@ -65,7 +65,7 @@ class ChatVC: JSQMessagesViewController {
     }
     
     func loadMessages() {
-        API.getChatMessages(chatId: self.chat.id, completionHandler: {
+        API.getChatMessages(userId: Cache.loadUser().id, chatId: self.chat.id, completionHandler: {
             (response, chat) -> Void in
             self.removeSpinner()
             if response != URLResponse.Success {

@@ -32,6 +32,9 @@ class API {
                 
                 let userJson = json!["user"] as! [String : String]
                 let contact = Contact.deserialize(json: userJson)
+                let sessionToken = userJson["session_token"]!
+                Cache.cacheSessionToke(sessionToken: sessionToken)
+                
                 completionHandler(URLResponse.Success, contact)
             })
         })
@@ -39,7 +42,7 @@ class API {
     
     // Chats
     class func getUsersChats(userId: String, completionHandler: @escaping (URLResponse, [Chat]?) -> Void) {
-        API.performRequest(requestType: "GET", urlPath: "users/\(userId)/chats", json: nil, token: nil, completionHandler: {
+        API.performRequest(requestType: "GET", urlPath: "users/\(userId)/chats", json: nil, token: Cache.getSessionToken(), completionHandler: {
             (response, data) in
             
             handleResponse(response: response, data: data, completionHandler: {
@@ -58,8 +61,8 @@ class API {
     
     // Messages
     
-    class func getChatMessages(chatId: String, completionHandler: @escaping (URLResponse, Chat?) -> Void) {
-        API.performRequest(requestType: "GET", urlPath: "chats/\(chatId)/messages", json: nil, token: nil, completionHandler: {
+    class func getChatMessages(userId: String, chatId: String, completionHandler: @escaping (URLResponse, Chat?) -> Void) {
+        API.performRequest(requestType: "GET", urlPath: "users/\(userId)/chats/\(chatId)/messages", json: nil, token: Cache.getSessionToken(), completionHandler: {
             (response, data) in
             
             handleResponse(response: response, data: data, completionHandler: {
@@ -79,7 +82,7 @@ class API {
     class func createMessage(userId: String, chatId: String, message: String, completionHandler: @escaping (URLResponse, Chat?) -> Void) {
         let json = ["message": message]
         
-        API.performRequest(requestType: "POST", urlPath: "users/\(userId)/chats/\(chatId)/messages", json: json, token: nil, completionHandler: {
+        API.performRequest(requestType: "POST", urlPath: "users/\(userId)/chats/\(chatId)/messages", json: json, token: Cache.getSessionToken(), completionHandler: {
             (response, data) in
             
             handleResponse(response: response, data: data, completionHandler: {
@@ -97,10 +100,10 @@ class API {
         })
     }
     
-    class func createChat(userIds: [String], completionHandler: @escaping (URLResponse, Chat?) -> Void) {
+    class func createChat(userId: String, userIds: [String], completionHandler: @escaping (URLResponse, Chat?) -> Void) {
         let json = ["user_ids": userIds]
         
-        API.performRequest(requestType: "POST", urlPath: "chats", json: json, token: nil, completionHandler: {
+        API.performRequest(requestType: "POST", urlPath: "users/\(userId)/chats", json: json, token: Cache.getSessionToken(), completionHandler: {
             (response, data) in
             
             handleResponse(response: response, data: data, completionHandler: {
@@ -117,7 +120,7 @@ class API {
     }
     
     class func deleteUser(userId: String, completionHandler: @escaping (URLResponse) -> Void) {
-        API.performRequest(requestType: "DELETE", urlPath: "users/\(userId)", json: nil, token: nil, completionHandler: {
+        API.performRequest(requestType: "DELETE", urlPath: "users/\(userId)", json: nil, token: Cache.getSessionToken(), completionHandler: {
             (response, data) in
             
             handleResponse(response: response, data: data, completionHandler: {
@@ -130,7 +133,7 @@ class API {
     
     class func patchUser(userId: String, firstName: String, lastName: String, completionHandler: @escaping (URLResponse, Contact?) -> Void) {
         let json = ["first_name": firstName, "last_name": lastName]
-        API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)", json: json, token: nil, completionHandler: {
+        API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)", json: json, token: Cache.getSessionToken(), completionHandler: {
             (response, data) in
             
             handleResponse(response: response, data: data, completionHandler: {
@@ -149,7 +152,7 @@ class API {
     
     class func patchChat(userId: String, chatId: String, title: String, completionHandler: @escaping (URLResponse) -> Void) {
         let json = ["title": title]
-        API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)/chats/\(chatId)", json: json, token: nil, completionHandler: {
+        API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)/chats/\(chatId)", json: json, token: Cache.getSessionToken(), completionHandler: {
             (response, data) in
             
             handleResponse(response: response, data: data, completionHandler: {
@@ -162,7 +165,7 @@ class API {
     
     class func patchChatAddUsers(userId: String, chatId: String, userIdsToAdd: [String], completionHandler: @escaping (URLResponse, Chat?) -> Void) {
         let json = ["user_ids" : userIdsToAdd]
-        API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)/chats/\(chatId)/add_users", json: json, token: nil, completionHandler: {
+        API.performRequest(requestType: "PATCH", urlPath: "users/\(userId)/chats/\(chatId)/add_users", json: json, token: Cache.getSessionToken(), completionHandler: {
             (response, data) in
             
             handleResponse(response: response, data: data, completionHandler: {
@@ -179,7 +182,7 @@ class API {
     }
     
     class func removeUserFromChat(userId: String, chatId: String, completionHandler: @escaping (URLResponse) -> Void) {
-        API.performRequest(requestType: "DELETE", urlPath: "users/\(userId)/chats/\(chatId)", json: nil, token: nil, completionHandler: {
+        API.performRequest(requestType: "DELETE", urlPath: "users/\(userId)/chats/\(chatId)", json: nil, token: Cache.getSessionToken(), completionHandler: {
             (response, data) in
             
             handleResponse(response: response, data: data, completionHandler: {
@@ -244,7 +247,7 @@ class API {
         
         // If token is not nil, add it to the request.
         if token != nil {
-            request.setValue("Token " + token!, forHTTPHeaderField: "Authorization")
+            request.setValue(token!, forHTTPHeaderField: "Session-Token")
         }
         
         // Perform request.
