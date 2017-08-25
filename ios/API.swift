@@ -16,6 +16,27 @@ class API {
     static let environment = ENV
     static let rootURLString = CHATTER_URL
     
+    class func getUser(userId: String, completionHandler: @escaping (URLResponse, Contact?) -> Void) {
+        API.performRequest(requestType: "GET", urlPath: "users/\(userId)", json: nil, token: Cache.getSessionToken(), completionHandler: {
+            (response, data) in
+            
+            handleResponse(response: response, data: data, completionHandler: {
+                response, json in
+            
+                if response != URLResponse.Success {
+                    return completionHandler(response, nil)
+                }
+            
+                let userJson = json!["user"] as! [String : String]
+                let contact = Contact.deserialize(json: userJson)
+                let sessionToken = userJson["session_token"]!
+                Cache.cacheSessionToken(sessionToken: sessionToken)
+            
+                completionHandler(URLResponse.Success, contact)
+            })
+        })
+    }
+
     class func createUser(firstName: String, lastName: String, apnToken: String, completionHandler: @escaping (URLResponse, Contact?) -> Void) {
         let json = ["first_name" : firstName, "last_name" : lastName, "apn_token" : apnToken]
 
@@ -33,7 +54,7 @@ class API {
                 let userJson = json!["user"] as! [String : String]
                 let contact = Contact.deserialize(json: userJson)
                 let sessionToken = userJson["session_token"]!
-                Cache.cacheSessionToke(sessionToken: sessionToken)
+                Cache.cacheSessionToken(sessionToken: sessionToken)
                 
                 completionHandler(URLResponse.Success, contact)
             })

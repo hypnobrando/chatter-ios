@@ -27,6 +27,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         application.registerForRemoteNotifications()
         
         self.window = UIWindow(frame: UIScreen.main.bounds)
+        let emptyVC = EmptyVC()
+        self.window!.rootViewController = emptyVC
+        self.window!.makeKeyAndVisible()
         
         //Cache.clear()
         //Cache.setPin(pin: "3131")
@@ -41,8 +44,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Load the cache if it exists.
         let user = Cache.loadUser()
         
-        var mainView : UIViewController
-        if !user.isEmpty() {
+        if user.isEmpty() {
+            let mainView = SignInVC()
+            
+            self.window!.rootViewController = mainView
+            self.window?.makeKeyAndVisible()
+            return
+        }
+        
+        API.getUser(userId: user.id, completionHandler: {
+            (response, user) in
+            
+            if response != URLResponse.Success {
+                self.window!.rootViewController?.pushSingleAlertActionView(title: "Internet Connection Error", message: "Retry", handler: {
+                    _ in
+                    
+                    self.loadApp()
+                })
+                
+                return
+            }
+            
             let pin = PinVC()
             pin.placeholder = ""
             pin.completionHandler = {
@@ -53,15 +75,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 pin.present(nav, animated: true, completion: nil)
             }
             
-            mainView = pin
-
-        } else {
-            mainView = SignInVC()
-        }
-        //mainView = PinVC()
-        
-        self.window!.rootViewController = mainView
-        self.window?.makeKeyAndVisible()
+            let mainView = pin
+            self.window!.rootViewController = mainView
+            self.window?.makeKeyAndVisible()
+        })
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -138,7 +155,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-        loadApp()
+        let user = Cache.loadUser()
+        
+        if user.isEmpty() {
+            let mainView = SignInVC()
+            
+            self.window!.rootViewController = mainView
+            self.window?.makeKeyAndVisible()
+            return
+
+        }
+        
+        let pin = PinVC()
+        pin.placeholder = ""
+        pin.completionHandler = {
+            (_: String) -> Void in
+            let nav = UINavigationController()
+            let home = HomeVC()
+            nav.viewControllers = [home]
+            pin.present(nav, animated: true, completion: nil)
+        }
+        
+        let mainView = pin
+        self.window!.rootViewController = mainView
+        self.window?.makeKeyAndVisible()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
