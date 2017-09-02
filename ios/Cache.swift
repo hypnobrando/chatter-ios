@@ -147,4 +147,17 @@ class Cache {
         
         return ""
     }
+    
+    static func isFirstTimer() -> Bool {
+        if let firstTime = defaults.value(forKey: "FirstTime") as? Bool {
+            return firstTime
+        }
+        
+        return true
+    }
+    
+    static func setFirstTime(isFirstTime: Bool) {
+        defaults.set(isFirstTime, forKey: "FirstTime")
+        defaults.synchronize()
+    }
 }

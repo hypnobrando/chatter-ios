@@ -35,7 +35,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //Cache.setPin(pin: "3131")
         //Cache.removeAllNotifications()
         
-        loadApp()
+        if Cache.isFirstTimer() {
+            self.window!.rootViewController = IntroVC(coder: .init())
+            self.window?.makeKeyAndVisible()
+        } else {
+            loadApp()
+        }
         
         return true
     }
@@ -56,7 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             (response, user) in
             
             if response != URLResponse.Success {
-                self.window!.rootViewController?.pushSingleAlertActionView(title: "Internet Connection Error", message: "Retry", handler: {
+                self.window!.rootViewController?.pushSingleAlertActionView(title: "Internet Connection Error", message: "", okButtonText: "Retry", handler: {
                     _ in
                     
                     self.loadApp()
@@ -155,6 +160,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        if Cache.isFirstTimer() {
+            self.window!.rootViewController = IntroVC(coder: .init())
+            self.window?.makeKeyAndVisible()
+            return
+        }
+        
         let user = Cache.loadUser()
         
         if user.isEmpty() {

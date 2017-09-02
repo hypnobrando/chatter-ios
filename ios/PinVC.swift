@@ -68,7 +68,7 @@ class PinVC: ChatterVC, UITextFieldDelegate {
         
         if currentPin == nil {
             if completionHandler != nil {
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: 500), execute: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                     self.completionHandler!(pin)
                 })
             }
@@ -77,7 +77,7 @@ class PinVC: ChatterVC, UITextFieldDelegate {
         
         if currentPin! == pin {
             if self.completionHandler != nil {
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: 500), execute: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                     self.completionHandler!(pin)
                 })
             }

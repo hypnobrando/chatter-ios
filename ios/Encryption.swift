@@ -35,11 +35,13 @@ class Encryption {
     }
     
     func encrypt(message: String) -> String {
-        return AES256CBC.encryptString(message, password: key)!
+        let encryption = AES256CBC.encryptString(message, password: key)
+        return encryption == nil ? "" : encryption!
     }
     
     func decrypt(message: String) -> String {
-        return AES256CBC.decryptString(message, password: key)!
+        let decryption = AES256CBC.decryptString(message, password: key)
+        return decryption == nil ? "COULD NOT DECRYPT" : decryption!
     }
     
     class func randomStringWithLength(i: Int) -> String {

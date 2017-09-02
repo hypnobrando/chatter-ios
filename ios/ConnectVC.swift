@@ -15,7 +15,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     let CHARACTERISTIC_UUID = UUID(uuidString: "EBB708B1-154D-4F9A-AF0A-B4CF1B05D5DF")!
     let BUTTON_HEIGHT : CGFloat = 50.0
     
-    var state = ButtonState.CentralIdle
+    var state = ButtonState.CentralSearching
     var chatType = ChatType.NewChat
     var existingChat = Chat()
     
@@ -43,7 +43,7 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         table.delegate = self
         button = Button(frame: CGRect(x: view.frame.origin.x, y: table.frame.maxY, width: view.frame.width, height: BUTTON_HEIGHT))
         button.backgroundColor = BlueColor
-        button.setTitle("Search", for: .normal)
+        button.setTitle("Searching", for: .normal)
         button.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
         
         // Setup bluetooth.
@@ -51,6 +51,14 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
         central.delegate = self
         central.addAvailabilityObserver(self)
         listenBT()
+        
+        // Start BT.
+        if central.availability == BKAvailability.available {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
+                // Put your code which should be executed with a delay here
+                self.beginBT()
+            })
+        }
         
         // Add subviews
         view.addSubview(button)
@@ -282,9 +290,23 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     
     func availabilityObserver(_ availabilityObservable: BKAvailabilityObservable, availabilityDidChange availability: BKAvailability) {
         if availability != BKAvailability.available {
+            button.setTitle("Bluetooth is off", for: .normal)
+            button.backgroundColor = UIColor.red
+            state = .BTOff
             pushAlertView(title: "Bluetooth Off", message: "Please turn on bluetooth.")
+            discoveries = [BKDiscovery]()
+            table.reloadData()
+            
+            do {
+                try central.interruptScan()
+                try peripheral.stop()
+            } catch let error {
+                print(error)
+            }
             return
         }
+        
+        beginBT()
     }
     
     func availabilityObserver(_ availabilityObservable: BKAvailabilityObservable, unavailabilityCauseDidChange unavailabilityCause: BKUnavailabilityCause) {
@@ -320,45 +342,8 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     func buttonClicked(sender: UIButton!) {
         
         switch state {
-        case ButtonState.CentralIdle:
-            // User wants to start searching so lets do it baby.
-            
-            button.setTitle("Stop", for: .normal)
-            state = .CentralSearching
-            broadcastBT()
-            central.scanContinuouslyWithChangeHandler({
-                (changes, discoveries) in
-                // Handle changes to "availabile" discoveries, [BKDiscoveriesChange].
-                // Handle current "available" discoveries, [BKDiscovery].
-                // This is where you'd ie. update a table view.
-                print(changes, discoveries)
-                
-                if changes.count < 1 {
-                    return
-                }
-                
-                if self.state == .PeripheralAskingToConnect {
-                    self.restartBT()
-                }
-                
-                // Reload table data.
-                self.discoveries = discoveries
- 
-                self.table.reloadData()
-                
-            }, stateHandler: { newState in
-                // Handle newState, BKCentral.ContinuousScanState.
-                // This is where you'd ie. start/stop an activity indicator.
-                print(newState)
-                
-            }, duration: 1, inBetweenDelay: 1, errorHandler: { error in
-                // Handle error.
-                print(error)
-            })
-            
         case ButtonState.CentralSearching:
-            // User wants to stop searching.
-            restartBT()
+            print("POOP")
         
         case ButtonState.PeripheralAskingToConnect:
             // Peripheral wants to send data to central.
@@ -431,21 +416,55 @@ class ConnectVC: ChatterVC, UITableViewDataSource, UITableViewDelegate, BKPeriph
     func restartBT() {
         discoveries = [BKDiscovery]()
         table.reloadData()
-        do {
-            try central.interruptScan()
-            try peripheral.stop()
-        } catch let error {
-            print(error)
-        }
         removeSpinner()
-        button.setTitle("Search", for: .normal)
+        button.setTitle("Searching", for: .normal)
         button.backgroundColor = BlueColor
-        state = .CentralIdle
+        state = .CentralSearching
+    }
+    
+    func beginBT() {
+        
+        // User wants to start searching so lets do it baby.
+        button.setTitle("Searching", for: .normal)
+        button.backgroundColor = BlueColor
+        state = .CentralSearching
+        broadcastBT()
+
+        central.scanContinuouslyWithChangeHandler({
+            (changes, discoveries) in
+            // Handle changes to "availabile" discoveries, [BKDiscoveriesChange].
+            // Handle current "available" discoveries, [BKDiscovery].
+            // This is where you'd ie. update a table view.
+            print(changes, discoveries)
+            
+            if changes.count < 1 {
+                return
+            }
+            
+            if self.state == .PeripheralAskingToConnect {
+                self.restartBT()
+            }
+            
+            // Reload table data.
+            self.discoveries = discoveries
+            
+            self.table.reloadData()
+            
+        }, stateHandler: { newState in
+            // Handle newState, BKCentral.ContinuousScanState.
+            // This is where you'd ie. start/stop an activity indicator.
+            print(newState)
+            
+        }, duration: 1, inBetweenDelay: 1, errorHandler: { error in
+            // Handle error.
+            print(error)
+        })
+
     }
 }
 
 enum ButtonState {
-    case CentralIdle
+    case BTOff
     case CentralSearching
     case CentralReadyToConnect
     case CentralConnecting

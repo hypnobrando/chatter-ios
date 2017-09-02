@@ -34,6 +34,7 @@
 		A8AFBC9E1F324E96007A5FEE /* ChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8AFBC9D1F324E96007A5FEE /* ChatVC.swift */; };
 		A8AFBCA21F325148007A5FEE /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8AFBCA11F325148007A5FEE /* Contact.swift */; };
 		A8CC93ED1F509CE800D85931 /* EmptyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CC93EC1F509CE800D85931 /* EmptyVC.swift */; };
+		A8CC93EF1F59BA5100D85931 /* IntroVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CC93EE1F59BA5100D85931 /* IntroVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,6 +69,7 @@
 		A8AFBC9D1F324E96007A5FEE /* ChatVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatVC.swift; sourceTree = "<group>"; };
 		A8AFBCA11F325148007A5FEE /* Contact.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
 		A8CC93EC1F509CE800D85931 /* EmptyVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyVC.swift; sourceTree = "<group>"; };
+		A8CC93EE1F59BA5100D85931 /* IntroVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroVC.swift; sourceTree = "<group>"; };
 		E8DD1625AE0DF654FC9ABB74 /* Pods-ios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ios/Pods-ios.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -206,6 +208,7 @@
 				A880EB401F3D58E900340B2C /* PinVC.swift */,
 				A871C97B1F44F9AE0082E7AB /* ChatInfoVC.swift */,
 				A8CC93EC1F509CE800D85931 /* EmptyVC.swift */,
+				A8CC93EE1F59BA5100D85931 /* IntroVC.swift */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -356,6 +359,7 @@
 				A871C97C1F44F9AE0082E7AB /* ChatInfoVC.swift in Sources */,
 				A880EB481F3E289F00340B2C /* ChatterVC.swift in Sources */,
 				A8AFBC8A1F324C9A007A5FEE /* HomeVC.swift in Sources */,
+				A8CC93EF1F59BA5100D85931 /* IntroVC.swift in Sources */,
 				A82974C01F32AE7B00DC7B7A /* TextField.swift in Sources */,
 				A8CC93ED1F509CE800D85931 /* EmptyVC.swift in Sources */,
 				A82974C21F33ACB500DC7B7A /* ConnectVC.swift in Sources */,
