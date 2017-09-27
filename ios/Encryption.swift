@@ -40,8 +40,8 @@ class Encryption {
     }
     
     func decrypt(message: String) -> String {
-        let decryption = AES256CBC.decryptString(message, password: key)
-        return decryption == nil ? "COULD NOT DECRYPT" : decryption!
+        let decryption = try AES256CBC.decryptString(message, password: key)
+        return decryption == nil ? message : decryption!
     }
     
     class func randomStringWithLength(i: Int) -> String {

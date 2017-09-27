@@ -100,8 +100,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         case .active:
             if let payload = userInfo as? [String : Any] {
                 if let type = payload["type"] as? String {
-                    if let chatId = payload["chat_id"] as? String {
-                        Cache.addNewNotification(chatId: chatId)
+                    if type == "clear" {
+                        Cache.removeAllNotifications()
+                    } else {
+                        if let chatId = payload["chat_id"] as? String {
+                            Cache.addNewNotification(chatId: chatId)
+                        }
                     }
                 }
                 
@@ -111,8 +115,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         case .background:
             if let payload = userInfo as? [String : Any] {
                 if let type = payload["type"] as? String {
-                    if let chatId = payload["chat_id"] as? String {
-                        Cache.addNewNotification(chatId: chatId)
+                    if type == "clear" {
+                        Cache.removeAllNotifications()
+                    } else {
+                        if let chatId = payload["chat_id"] as? String {
+                            Cache.addNewNotification(chatId: chatId)
+                        }
                     }
                 }
             }
@@ -120,8 +128,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         case .inactive:
             if let payload = userInfo as? [String : Any] {
                 if let type = payload["type"] as? String {
-                    if let chatId = payload["chat_id"] as? String {
-                        Cache.addNewNotification(chatId: chatId)
+                    if type == "clear" {
+                        Cache.removeAllNotifications()
+                    } else {
+                        if let chatId = payload["chat_id"] as? String {
+                            Cache.addNewNotification(chatId: chatId)
+                        }
                     }
                 }
             }

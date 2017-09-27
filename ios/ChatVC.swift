@@ -31,7 +31,7 @@ class ChatVC: JSQMessagesViewController {
         
         // Set up background.
         view.backgroundColor = UIColor.white
-        title = chat.ChatNameGivenUser(user: Cache.loadUser())
+        title = chat.users.count > 2 ? "" : chat.ChatNameGivenUser(user: Cache.loadUser())
         
         // Setup chat info button.
         chatInfoButton = UIButton(frame: CGRect(x: navigationController!.navigationBar.bounds.maxX - INFO_BUTTON_WIDTH - RIGHT_MARGIN, y: navigationController!.navigationBar.bounds.maxY - INFO_BUTTON_WIDTH, width: INFO_BUTTON_WIDTH, height: INFO_BUTTON_WIDTH))
