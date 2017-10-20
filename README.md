@@ -1,4 +1,4 @@
-# secure-chat-ios
+# chatter-ios
 
 ### download on [app store](https://itunes.apple.com/us/app/chatter-secure-messenger/id1290342381?mt=8)
 
