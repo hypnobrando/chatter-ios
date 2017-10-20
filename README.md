@@ -1,5 +1,7 @@
 # secure-chat-ios
 
+### download on [app store](https://itunes.apple.com/us/app/chatter-secure-messenger/id1290342381?mt=8)
+
 ### run locally:
 * install [cocoa pods](https://cocoapods.org/)
 * `pod install` to install dependencies
